@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dr. Dev Admin</title>
+<style>
+  :root {
+    --bg: #0b0f1a; --panel: #131b2e; --line: #232c44; --text: #e7ecf7; --muted: #8b95b0;
+    --cyan: #22d3ee; --red: #ff2d55; --green: #2fd48a; --amber: #f5b942;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: #141c2e; border-bottom: 1px solid var(--line); }
+  header b { font-size: 18px; }
+  header span { color: var(--cyan); font-size: 13px; }
+  main { max-width: 1100px; margin: 0 auto; padding: 18px; display: grid; gap: 16px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .stat .n { font-size: 30px; font-weight: 700; }
+  .stat .l { color: var(--muted); font-size: 13px; }
+  .stat.live .n { color: var(--green); } .stat.exp .n { color: var(--red); }
+  h2 { font-size: 16px; margin: 0 0 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+  label { display: grid; gap: 4px; color: var(--muted); font-size: 12px; }
+  input[type=date], input[type=number], input[type=text], textarea {
+    background: #0b0f1a; color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; font: inherit; color-scheme: dark;
+  }
+  textarea { width: 100%; min-height: 60px; resize: vertical; }
+  button { background: var(--cyan); color: #04202a; border: 0; border-radius: 10px; padding: 9px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+  button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); font-weight: 500; }
+  button.danger { background: transparent; color: var(--red); border: 1px solid #4a2030; }
+  button:disabled { opacity: .5; cursor: default; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 800px) { .grid2 { grid-template-columns: 1fr; } }
+  .switch { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .switch input { width: 18px; height: 18px; accent-color: var(--red); }
+  .tablewrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 760px; }
+  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  .key { font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: .5px; }
+  .badge { padding: 2px 9px; border-radius: 99px; font-size: 12px; border: 1px solid; }
+  .badge.live { color: var(--green); border-color: #1c5a41; } .badge.expired { color: var(--red); border-color: #5a1c2c; } .badge.revoked { color: var(--amber); border-color: #5a4a1c; }
+  .actions { display: flex; gap: 6px; }
+  .actions button { padding: 5px 9px; font-size: 12px; }
+  #toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: #1d2742; border: 1px solid var(--line); padding: 10px 16px; border-radius: 10px; display: none; max-width: 90vw; }
+  .newkeys { margin-top: 12px; display: none; }
+  .newkeys pre { margin: 8px 0 0; background: #0b0f1a; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-family: ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; }
+  .muted { color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<header><b>Dr. Dev Admin</b><span>License &amp; app control</span></header>
+<main>
+  <section class="stats">
+    <div class="card stat"><div class="n" id="s_users">-</div><div class="l">Total users</div></div>
+    <div class="card stat"><div class="n" id="s_keys">-</div><div class="l">Total license keys</div></div>
+    <div class="card stat live"><div class="n" id="s_live">-</div><div class="l">Live</div></div>
+    <div class="card stat exp"><div class="n" id="s_expired">-</div><div class="l">Expired</div></div>
+    <div class="card stat"><div class="n" id="s_blocked">-</div><div class="l">Blocked devices</div></div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <h2>Create license key</h2>
+      <div class="row">
+        <label>Valid until<input type="date" id="c_date"></label>
+        <label>How many<input type="number" id="c_count" value="1" min="1" max="50" style="width:80px"></label>
+        <label>Note (optional)<input type="text" id="c_note" maxlength="60" placeholder="Customer name"></label>
+        <button id="c_btn">Generate</button>
+      </div>
+      <p class="muted">Keys are 18 characters and bind to the first device that uses them. Validity ends at 11:59 PM IST on the chosen date.</p>
+      <div class="newkeys" id="newkeys"><span class="muted">New keys</span><pre id="newkeys_list"></pre><button class="ghost" id="copy_new">Copy</button></div>
+    </div>
+    <div class="card">
+      <h2>Maintenance mode</h2>
+      <div class="switch"><input type="checkbox" id="m_on"><label for="m_on" style="color:var(--text);font-size:15px">App disabled for everyone</label></div>
+      <textarea id="m_msg" placeholder="Message shown in the app dialog"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button id="m_btn">Save</button>
+        <button class="ghost" id="unblock_btn">Unblock all devices</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>License keys</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Key</th><th>Status</th><th>Valid until</th><th>Device</th><th>Setup</th><th>Last seen</th><th>Note</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<div id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const fmt = (ts) => ts ? new Date(ts * 1000).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) : "-";
+const fmtDate = (ts) => ts ? new Date(ts * 1000).toLocaleDateString([], { dateStyle: "medium" }) : "-";
+
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.style.display = "block";
+  clearTimeout(toast._t); toast._t = setTimeout(() => (t.style.display = "none"), 2800);
+}
+
+async function api(path, method = "GET", body) {
+  const r = await fetch(path, { method, headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.message || "Request failed");
+  return j;
+}
+
+function cell(text, cls) { const td = document.createElement("td"); td.textContent = text; if (cls) td.className = cls; return td; }
+
+function actionBtn(label, cls, fn) {
+  const b = document.createElement("button"); b.textContent = label; b.className = cls || "ghost";
+  b.onclick = async () => { try { await fn(); await load(); } catch (e) { toast(e.message); } };
+  return b;
+}
+
+async function load() {
+  const d = await api("/admin/api/overview");
+  $("s_users").textContent = d.stats.total_users;
+  $("s_keys").textContent = d.stats.total_keys;
+  $("s_live").textContent = d.stats.live;
+  $("s_expired").textContent = d.stats.expired;
+  $("s_blocked").textContent = d.stats.blocked_devices;
+  if (document.activeElement !== $("m_msg")) {
+    $("m_on").checked = d.maintenance.maintenance;
+    $("m_msg").value = d.maintenance.message;
+  }
+  const tb = $("rows"); tb.innerHTML = "";
+  d.licenses.forEach((l) => {
+    const tr = document.createElement("tr");
+    tr.appendChild(cell(l.key, "key"));
+    const st = document.createElement("td"); const bd = document.createElement("span");
+    bd.className = "badge " + l.status; bd.textContent = l.status; st.appendChild(bd); tr.appendChild(st);
+    tr.appendChild(cell(fmtDate(l.expires_at)));
+    tr.appendChild(cell(l.bound ? "Bound " + l.device : "Not used"));
+    tr.appendChild(cell(l.configured ? "Done" : "-"));
+    tr.appendChild(cell(fmt(l.last_seen)));
+    tr.appendChild(cell(l.note || ""));
+    const ac = document.createElement("td"); const box = document.createElement("div"); box.className = "actions";
+    box.appendChild(actionBtn("Copy", "ghost", async () => { await navigator.clipboard.writeText(l.key); toast("Copied"); }));
+    box.appendChild(actionBtn("Extend", "ghost", async () => {
+      const v = prompt("New valid-until date (YYYY-MM-DD)"); if (!v) return;
+      await api("/admin/api/licenses/" + l.key + "/extend", "POST", { valid_until: v }); toast("Extended");
+    }));
+    if (l.bound) box.appendChild(actionBtn("Reset device", "ghost", async () => {
+      if (!confirm("Unbind this key from its device?")) return;
+      await api("/admin/api/licenses/" + l.key + "/reset-device", "POST", {}); toast("Device reset");
+    }));
+    box.appendChild(actionBtn(l.revoked ? "Restore" : "Revoke", "ghost", async () => {
+      await api("/admin/api/licenses/" + l.key + "/revoke", "POST", { revoked: !l.revoked });
+    }));
+    box.appendChild(actionBtn("Delete", "danger", async () => {
+      if (!confirm("Delete " + l.key + " permanently?")) return;
+      await api("/admin/api/licenses/" + l.key, "DELETE");
+    }));
+    ac.appendChild(box); tr.appendChild(ac); tb.appendChild(tr);
+  });
+  if (!d.licenses.length) { const tr = document.createElement("tr"); const td = cell("No license keys yet."); td.colSpan = 8; tr.appendChild(td); tb.appendChild(tr); }
+}
+
+$("c_btn").onclick = async () => {
+  try {
+    const r = await api("/admin/api/licenses", "POST", { valid_until: $("c_date").value, count: +$("c_count").value, note: $("c_note").value });
+    $("newkeys_list").textContent = r.keys.join("\n"); $("newkeys").style.display = "block";
+    $("c_note").value = ""; await load();
+  } catch (e) { toast(e.message); }
+};
+$("copy_new").onclick = async () => { await navigator.clipboard.writeText($("newkeys_list").textContent); toast("Copied"); };
+$("m_btn").onclick = async () => {
+  try { await api("/admin/api/maintenance", "POST", { enabled: $("m_on").checked, message: $("m_msg").value }); toast($("m_on").checked ? "Maintenance is ON" : "Maintenance is OFF"); await load(); }
+  catch (e) { toast(e.message); }
+};
+$("unblock_btn").onclick = async () => {
+  try { const r = await api("/admin/api/unblock-all", "POST", {}); toast(r.unblocked + " device(s) unblocked"); await load(); } catch (e) { toast(e.message); }
+};
+
+(function init() {
+  const d = new Date(); d.setDate(d.getDate() + 30);
+  $("c_date").value = d.toISOString().slice(0, 10);
+  $("c_date").min = new Date().toISOString().slice(0, 10);
+  load().catch((e) => toast(e.message));
+  setInterval(() => load().catch(() => {}), 30000);
+})();
+</script>
+</body>
+</html>

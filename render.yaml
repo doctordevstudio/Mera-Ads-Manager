@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: drdev-ads-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn main:app --workers 1 --threads 8 --timeout 180
+    healthCheckPath: /health
+    envVars:
+      - key: FIREBASE_DB_URL
+        sync: false
+      - key: APP_SECRET
+        generateValue: true
+      - key: ADMIN_USER
+        value: admin
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: GRAPH_VERSION
+        value: v25.0
+      - key: ALLOWED_APP_SIGS
+        sync: false
