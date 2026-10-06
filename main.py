@@ -264,7 +264,7 @@ def register_fail(h: str):
 @app.before_request
 def guard():
     p = request.path
-    if p in ("/", "/health") or p.startswith("/admin"):
+    if p in ("/", "/health", "/favicon.ico") or p.startswith("/admin"):
         return None
     if not DB_URL or not APP_SECRET:
         return jsonify(error="server", message="Server is not configured."), 500
@@ -289,6 +289,11 @@ def on_error(e):
 @app.get("/")
 def index():
     return "Dr. Dev Ads API is running."
+
+
+@app.get("/favicon.ico")
+def favicon():
+    return "", 204
 
 
 @app.get("/health")
@@ -504,12 +509,16 @@ def meta_upload(kind):
 def admin_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
+        missing = [n for n, v in (("FIREBASE_DB_URL", DB_URL), ("APP_SECRET", APP_SECRET), ("ADMIN_PASSWORD", ADMIN_PASSWORD)) if not v]
+        if missing:
+            return Response(
+                "Server setup incomplete. Add these environment variables in Render > Environment, then redeploy: "
+                + ", ".join(missing),
+                500,
+            )
         a = request.authorization
         ok = bool(
             a
-            and ADMIN_PASSWORD
-            and DB_URL
-            and APP_SECRET
             and hmac.compare_digest((a.username or "").encode(), ADMIN_USER.encode())
             and hmac.compare_digest((a.password or "").encode(), ADMIN_PASSWORD.encode())
         )
