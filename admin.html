@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070a1f">
+<title>Dr. Dev Control Center</title>
+<style>
+:root{
+  --bg:#070a1f;--bg2:#0d1236;--card:rgba(255,255,255,.06);--card2:rgba(255,255,255,.09);--line:rgba(255,255,255,.12);
+  --text:#eef1ff;--muted:#9aa4d0;--violet:#7c5cff;--cyan:#22d3ee;--pink:#ff4d8d;--amber:#ffb84d;--green:#2fe39a;--red:#ff5470;
+  --g1:linear-gradient(135deg,#7c5cff 0%,#22d3ee 100%);--g2:linear-gradient(135deg,#ff7a59 0%,#ff3d81 100%);--g3:linear-gradient(135deg,#2fe39a,#22d3ee);
+  --r:18px;--ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;color:var(--text);font:15px/1.5 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body:before{content:"";position:fixed;inset:0;z-index:-2;background:
+  radial-gradient(900px 600px at 10% -10%,#2a1b7a 0%,transparent 60%),
+  radial-gradient(800px 600px at 110% 10%,#0b4f7a 0%,transparent 55%),
+  radial-gradient(900px 700px at 50% 120%,#5a1550 0%,transparent 55%),var(--bg)}
+.orb{position:fixed;border-radius:50%;filter:blur(70px);opacity:.45;z-index:-1;animation:float 14s ease-in-out infinite}
+.orb.a{width:340px;height:340px;background:#7c5cff;left:-80px;top:12%}
+.orb.b{width:300px;height:300px;background:#22d3ee;right:-60px;top:48%;animation-delay:-5s}
+.orb.c{width:260px;height:260px;background:#ff4d8d;left:35%;bottom:-90px;animation-delay:-9s}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-40px) scale(1.12)}}
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+@keyframes shine{0%{transform:translateX(-120%)}60%,100%{transform:translateX(220%)}}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{to{background-position:-200% 0}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(124,92,255,.5)}50%{box-shadow:0 0 0 12px rgba(124,92,255,0)}}
+.up{animation:up .6s var(--ease) both;animation-delay:calc(var(--i,0)*70ms)}
+[hidden]{display:none!important}
+h1,h2,h3{margin:0;letter-spacing:-.02em}
+h1{font-size:30px}h2{font-size:21px}h3{font-size:16px}
+.muted{color:var(--muted)}.small{font-size:13px}.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.grow{flex:1}
+.glass{background:var(--card);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.pad{padding:20px}
+
+/* buttons + fields */
+.btn{position:relative;overflow:hidden;border:0;border-radius:12px;padding:11px 18px;font-family:inherit;font-weight:600;font-size:14px;line-height:1;color:var(--text);background:var(--card2);border:1px solid var(--line);cursor:pointer;transition:transform .2s var(--ease),box-shadow .2s,background .2s}
+.btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.14)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--g1);border-color:transparent;color:#04121f;box-shadow:0 10px 30px rgba(34,211,238,.28)}
+.btn.primary:after{content:"";position:absolute;inset:0;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);animation:shine 3.4s infinite}
+.btn.warm{background:var(--g2);border-color:transparent;color:#fff;box-shadow:0 10px 30px rgba(255,61,129,.3)}
+.btn.danger{color:var(--red);background:rgba(255,84,112,.08);border-color:rgba(255,84,112,.3)}
+.btn.sm{padding:8px 12px;font-size:12.5px;border-radius:10px}.btn.big{padding:15px 22px;font-size:16px;width:100%}
+.btn:disabled{opacity:.55;pointer-events:none}
+.btn .sp{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:8px}
+.field{display:grid;gap:6px;font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.field>span small{font-weight:500;opacity:.8}
+input,select,textarea{width:100%;background:rgba(5,8,28,.55);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:inherit;font-weight:500;font-size:15px;outline:0;transition:border .2s,box-shadow .2s;color-scheme:dark}
+input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(34,211,238,.15)}
+textarea{min-height:92px;resize:vertical}
+input[type=range]{padding:0;height:6px;accent-color:var(--cyan)}
+input[type=checkbox]{width:18px;height:18px;padding:0;accent-color:var(--violet)}
+select option{background:#0d1236}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g6{grid-template-columns:repeat(6,1fr)}
+@media(max-width:900px){.g3,.g4,.g6{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.g2,.g3,.g4,.g6{grid-template-columns:1fr}.g6.keep2,.g4.keep2{grid-template-columns:repeat(2,1fr)}}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700;border:1px solid}
+.badge.live{color:var(--green);border-color:rgba(47,227,154,.35);background:rgba(47,227,154,.08)}
+.badge.expired{color:var(--red);border-color:rgba(255,84,112,.35);background:rgba(255,84,112,.08)}
+.badge.revoked{color:var(--amber);border-color:rgba(255,184,77,.35);background:rgba(255,184,77,.08)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;background:var(--card2);border:1px solid var(--line);font-size:13px;font-weight:600;cursor:pointer;user-select:none;transition:all .2s}
+.chip.on{background:var(--g1);color:#04121f;border-color:transparent}
+.chip:hover{transform:translateY(-1px)}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--g2);display:grid;place-items:center;font-weight:800;overflow:hidden;flex:none;border:2px solid rgba(255,255,255,.2)}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.switch{position:relative;width:46px;height:26px;flex:none}.switch input{opacity:0;position:absolute;inset:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+.switch i{position:absolute;inset:0;background:rgba(255,255,255,.18);border-radius:99px;transition:.25s}
+.switch i:after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.25s var(--ease)}
+.switch input:checked+i{background:var(--green)}.switch input:checked+i:after{transform:translateX(20px)}
+
+/* login */
+#login{min-height:100vh;display:grid;place-items:center;padding:24px}
+.login-card{width:100%;max-width:430px;padding:36px 32px;animation:pop .7s var(--ease) both}
+.login-card.shake{animation:shake .45s}
+.logo{width:74px;height:74px;border-radius:24px;background:var(--g1);display:grid;place-items:center;font-size:38px;margin:0 auto 18px;box-shadow:0 14px 40px rgba(124,92,255,.5);animation:pulse 3s infinite}
+.login-card h1{text-align:center;font-size:26px}.login-card p{text-align:center;margin:8px 0 24px}
+.login-card form{display:grid;gap:16px}
+.pw{position:relative}.pw button{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--muted);cursor:pointer;font-size:18px;padding:6px}
+.err{color:var(--red);font-weight:600;min-height:20px;text-align:center;font-size:13.5px}
+.trust{margin-top:18px;text-align:center;color:var(--muted);font-size:12.5px}
+.warn{background:rgba(255,184,77,.1);border:1px solid rgba(255,184,77,.35);color:var(--amber);padding:12px 14px;border-radius:12px;font-size:13.5px;margin-bottom:14px}
+
+/* shell */
+#app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+aside{position:sticky;top:0;height:100vh;padding:22px 16px;display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line);background:rgba(7,10,31,.5);backdrop-filter:blur(20px)}
+.brand{display:flex;align-items:center;gap:12px;padding:6px 8px 20px}.brand .logo{width:42px;height:42px;font-size:22px;margin:0;border-radius:14px;animation:none}
+.brand b{display:block;font-size:16px}.brand span{font-size:12px;color:var(--muted)}
+.nav{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;color:var(--muted);font-weight:600;cursor:pointer;transition:all .25s var(--ease);border:1px solid transparent}
+.nav:hover{background:var(--card);color:var(--text);transform:translateX(3px)}
+.nav.on{background:linear-gradient(90deg,rgba(124,92,255,.28),rgba(34,211,238,.12));color:#fff;border-color:rgba(124,92,255,.4)}
+.nav .ic{font-size:18px;width:22px;text-align:center}
+main{padding:28px clamp(16px,3vw,40px) 120px;max-width:1280px;width:100%}
+.view{animation:up .5s var(--ease) both}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+@media(max-width:820px){
+  #app{grid-template-columns:1fr}
+  aside{position:fixed;inset:auto 0 0 0;height:auto;flex-direction:row;justify-content:space-around;padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:40;border-right:0;border-top:1px solid var(--line)}
+  .brand,.sidefoot{display:none}.nav{flex-direction:column;gap:2px;padding:8px 10px;font-size:11px}.nav:hover{transform:none}
+  main{padding-bottom:130px}
+}
+
+/* stats */
+.stat{padding:18px;position:relative;overflow:hidden;transition:transform .3s var(--ease)}
+.stat:hover{transform:translateY(-4px)}
+.stat .n{font-size:34px;font-weight:800;letter-spacing:-.03em}
+.stat .l{color:var(--muted);font-size:13px;font-weight:600}
+.stat:before{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:var(--g1);opacity:.18}
+.stat.warm:before{background:var(--g2)}.stat.cool:before{background:var(--g3)}
+.nudge{padding:20px;border-radius:var(--r);background:linear-gradient(120deg,rgba(124,92,255,.28),rgba(255,61,129,.2));border:1px solid rgba(255,255,255,.18);display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.nudge .e{font-size:34px}
+
+/* table / list */
+.tablewrap{overflow-x:auto;border-radius:var(--r)}
+table{width:100%;border-collapse:collapse;min-width:820px}
+th,td{padding:13px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+tr.hov{transition:background .2s}tr.hov:hover{background:rgba(255,255,255,.04)}
+.key{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;font-weight:700}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.cards{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.acard{padding:18px;cursor:pointer;transition:all .3s var(--ease)}
+.acard:hover{transform:translateY(-5px);border-color:rgba(124,92,255,.6);box-shadow:0 24px 60px rgba(124,92,255,.25)}
+.tabs{display:flex;gap:6px;background:rgba(255,255,255,.05);padding:5px;border-radius:14px;border:1px solid var(--line);width:max-content;max-width:100%;overflow-x:auto;margin-bottom:18px}
+.tab{padding:10px 18px;border-radius:10px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;transition:.2s}
+.tab.on{background:var(--g1);color:#04121f}
+.bar{height:10px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}.bar>i{display:block;height:100%;border-radius:99px;background:var(--g3);width:0;transition:width 1s var(--ease)}
+.bar.hot>i{background:var(--g2)}
+.ring{position:relative;width:96px;height:96px;flex:none}.ring svg{transform:rotate(-90deg)}.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:26px}
+.camp{padding:18px;display:grid;gap:14px}
+.metric{background:rgba(255,255,255,.05);border-radius:12px;padding:10px 12px}.metric b{display:block;font-size:17px}.metric span{font-size:11.5px;color:var(--muted);font-weight:600}
+.savebar{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(120px);z-index:60;padding:12px 16px;border-radius:16px;display:flex;gap:12px;align-items:center;background:rgba(13,18,54,.92);border:1px solid rgba(124,92,255,.6);box-shadow:0 20px 60px rgba(0,0,0,.6);transition:transform .45s var(--ease);width:max-content;max-width:calc(100vw - 24px)}
+.savebar.show{transform:translateX(-50%);animation:pulse 2.4s infinite}
+@media(max-width:820px){.savebar{bottom:88px}}
+
+/* modal + wizard */
+.overlay{position:fixed;inset:0;z-index:70;background:rgba(3,5,20,.7);backdrop-filter:blur(8px);display:grid;place-items:center;padding:14px;animation:pop .3s var(--ease) both;overflow-y:auto}
+.modal{width:100%;max-width:560px;padding:24px;max-height:94vh;overflow-y:auto}
+.wiz{max-width:1020px;padding:0;display:flex;flex-direction:column;overflow:hidden;height:min(94vh,900px)}
+.wiz-head{padding:20px 24px 14px;border-bottom:1px solid var(--line)}
+.wiz-body{padding:22px 24px;overflow-y:auto;flex:1;min-height:0;animation:up .45s var(--ease) both}
+.wiz-foot{padding:14px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:space-between;align-items:center}
+.steps{display:flex;gap:6px;margin:12px 0 8px}.steps i{flex:1;height:6px;border-radius:9px;background:rgba(255,255,255,.12);transition:.4s}.steps i.done{background:var(--g1)}.steps i.now{background:var(--g2)}
+.opt{padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--card);cursor:pointer;transition:all .25s var(--ease)}
+.opt:hover{transform:translateY(-3px)}.opt.on{border-color:var(--cyan);background:rgba(34,211,238,.1);box-shadow:0 0 0 3px rgba(34,211,238,.15)}
+.split{display:grid;grid-template-columns:1fr 340px;gap:22px}@media(max-width:900px){.split{grid-template-columns:1fr}}
+.tags{display:flex;flex-wrap:wrap;gap:8px;padding:8px;border:1px solid var(--line);border-radius:12px;background:rgba(5,8,28,.55)}
+.tags input{border:0;background:none;box-shadow:none!important;flex:1;min-width:110px;padding:6px}
+.tag{display:inline-flex;gap:6px;align-items:center;padding:5px 10px;border-radius:99px;background:rgba(124,92,255,.25);font-size:13px;font-weight:600}.tag u{cursor:pointer;text-decoration:none;opacity:.7}
+/* facebook-like preview */
+.fb{background:#fff;color:#1c1e21;border-radius:14px;overflow:hidden;font:14px/1.4 system-ui,sans-serif;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.fb .h{display:flex;gap:10px;padding:12px;align-items:center}.fb .av{width:40px;height:40px;border-radius:50%;background:#ddd;overflow:hidden;display:grid;place-items:center;font-weight:700;color:#555}.fb .av img{width:100%;height:100%;object-fit:cover}
+.fb .t{padding:0 12px 10px;white-space:pre-wrap;word-break:break-word}.fb video,.fb .vid{width:100%;aspect-ratio:4/5;background:#111;object-fit:cover;display:block}
+.fb .lk{display:flex;gap:10px;align-items:center;background:#f0f2f5;padding:10px 12px}.fb .lk b{display:block}.fb .lk .b{margin-left:auto;background:#e4e6eb;border-radius:6px;padding:7px 12px;font-weight:700;font-size:13px}
+.fb .rx{display:flex;justify-content:space-between;padding:8px 12px;color:#65676b;font-size:13px}.fb .ab{display:flex;border-top:1px solid #e4e6eb}.fb .ab div{flex:1;text-align:center;padding:10px 4px;font-weight:600;color:#65676b;white-space:nowrap;font-size:13px}
+#toasts{position:fixed;right:16px;top:16px;z-index:200;display:grid;gap:10px}
+.toast{padding:12px 16px;border-radius:14px;background:rgba(13,18,54,.95);border:1px solid var(--line);box-shadow:0 14px 40px rgba(0,0,0,.5);animation:up .4s var(--ease) both;font-weight:600;max-width:340px}
+.toast.ok{border-color:rgba(47,227,154,.5)}.toast.bad{border-color:rgba(255,84,112,.6)}
+canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:300}
+.sk{height:84px;border-radius:var(--r);background:linear-gradient(90deg,rgba(255,255,255,.05) 25%,rgba(255,255,255,.12) 50%,rgba(255,255,255,.05) 75%);background-size:200% 100%;animation:shimmer 1.4s linear infinite}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="orb a"></div><div class="orb b"></div><div class="orb c"></div>
+
+<section id="login" hidden>
+  <div class="login-card glass" id="loginCard">
+    <div class="logo">🤡</div>
+    <h1>Welcome back, Dr. Dev</h1>
+    <p class="muted">Sign in to manage licenses, test accounts and campaign numbers. Everything is one click away.</p>
+    <div id="setupWarn" class="warn" hidden></div>
+    <form id="loginForm" autocomplete="on">
+      <label class="field"><span>Username</span><input id="lu" name="username" autocomplete="username" value="admin" spellcheck="false"></label>
+      <label class="field"><span>Password</span>
+        <div class="pw"><input id="lp" name="password" type="password" autocomplete="current-password" placeholder="Enter your password"><button type="button" id="eye" aria-label="Show password">👁</button></div>
+      </label>
+      <button class="btn primary big" id="loginBtn" type="submit">Sign in</button>
+      <div class="err" id="loginErr"></div>
+    </form>
+    <div class="trust">🔒 Encrypted session · signs you out automatically after 12 hours</div>
+  </div>
+</section>
+
+<div id="app" hidden>
+  <aside>
+    <div class="brand"><div class="logo">🤡</div><div><b>Dr. Dev</b><span>Control Center</span></div></div>
+    <div class="nav on" data-act="nav" data-tab="overview"><span class="ic">✨</span>Overview</div>
+    <div class="nav" data-act="nav" data-tab="licenses"><span class="ic">🔑</span>Licenses</div>
+    <div class="nav" data-act="nav" data-tab="demo"><span class="ic">🧪</span>Demo data</div>
+    <div class="nav" data-act="nav" data-tab="settings"><span class="ic">🛠</span>App control</div>
+    <div class="grow"></div>
+    <div class="nav sidefoot" data-act="logout"><span class="ic">🚪</span>Sign out</div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<div class="savebar glass" id="savebar"><span>✏️ You have unsaved changes</span><button class="btn sm" data-act="discard">Discard</button><button class="btn sm primary" data-act="saveDoc">Save changes</button></div>
+<div id="toasts"></div>
+<div id="layer"></div>
+<canvas id="fx"></canvas>
+<script>
+"use strict";
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const S={session:{},ov:null,tab:"overview",demos:[],acct:null,sub:"account",dirty:false,dayRow:null,day:{ci:0,date:""},gen:null,sample:""};
+let W=null;
+const CUR={INR:"₹",USD:"$",EUR:"€",GBP:"£",AED:"AED ",JPY:"¥",BDT:"৳",PKR:"Rs "};
+const money=(n,c="INR")=>(CUR[c]||c+" ")+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
+const num=n=>Number(n||0).toLocaleString("en-IN");
+const OBJ={OUTCOME_LEADS:["🎯","Leads","Get sign-ups or subscribers"],OUTCOME_SALES:["🛍️","Sales","Drive purchases"],OUTCOME_TRAFFIC:["🚀","Traffic","Send people to a website"],OUTCOME_ENGAGEMENT:["💬","Engagement","Get likes, comments, shares"],OUTCOME_AWARENESS:["📣","Awareness","Reach as many people as possible"],OUTCOME_APP_PROMOTION:["📱","App promotion","Get app installs"]};
+const RESULTS={subscribe_website:"Website Subscribes",lead:"Leads (website)","onsite_conversion.lead_grouped":"Leads (form)",purchase:"Purchases",landing_page_view:"Landing page views",link_click:"Link clicks",post_engagement:"Post engagements",mobile_app_install:"App installs"};
+const RESULT_BY_OBJ={OUTCOME_LEADS:"subscribe_website",OUTCOME_SALES:"purchase",OUTCOME_TRAFFIC:"landing_page_view",OUTCOME_ENGAGEMENT:"post_engagement",OUTCOME_AWARENESS:"link_click",OUTCOME_APP_PROMOTION:"mobile_app_install"};
+const BIDS={LOWEST_COST_WITHOUT_CAP:"Highest volume",LOWEST_COST_WITH_BID_CAP:"Bid cap",COST_CAP:"Cost per result goal",LOWEST_COST_WITH_MIN_ROAS:"ROAS goal"};
+const CTAS={LEARN_MORE:"Learn more",SIGN_UP:"Sign up",SUBSCRIBE:"Subscribe",SHOP_NOW:"Shop now",CONTACT_US:"Contact us",DOWNLOAD:"Download",APPLY_NOW:"Apply now",WATCH_MORE:"Watch more",BOOK_TRAVEL:"Book now",GET_OFFER:"Get offer"};
+const FBPOS={feed:"Feeds",instream_video:"In-stream videos",marketplace:"Marketplace",story:"Stories",video_feeds:"Video feeds",facebook_reels:"Reels",right_hand_column:"Right column",search:"Search results"};
+const IGPOS={stream:"Feed",story:"Stories",explore:"Explore",reels:"Reels",profile_feed:"Profile feed"};
+const INTERESTS=["Cricket","Indian Premier League","Fitness and wellness","Dancing","Online shopping","Technology","Music","Travel","Bollywood","Entrepreneurship","Gaming","Photography"];
+const iso=d=>d.toISOString().slice(0,10);
+const addDays=(s,n)=>{const d=new Date(s+"T00:00:00Z");d.setUTCDate(d.getUTCDate()+n);return iso(d)};
+const wday=s=>(new Date(s+"T00:00:00Z").getUTCDay()+6)%7;
+const todayIST=()=>S.acct?.today||iso(new Date(Date.now()+19800000));
+const host=u=>{try{return new URL(u).host}catch(e){return ""}};
+const fmtDate=ts=>ts?new Date(ts*1000).toLocaleDateString([],{day:"2-digit",month:"short",year:"numeric"}):"-";
+const fmtTime=ts=>ts?new Date(ts*1000).toLocaleString([],{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}):"-";
+const clone=o=>JSON.parse(JSON.stringify(o));
+const initial=n=>(String(n||"?").trim()[0]||"?").toUpperCase();
+const avatar=(url,name,size)=>`<div class="avatar" style="${size?`width:${size}px;height:${size}px`:""}">${url?`<img src="${esc(url)}" alt="" onerror="this.remove()">`:esc(initial(name))}</div>`;
+
+async function api(path,method="GET",body){
+  const r=await fetch(path,{method,headers:{"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined,credentials:"same-origin"});
+  let j={};try{j=await r.json()}catch(e){}
+  if(r.status===401&&path!=="/admin/login"){showLogin();throw new Error("Please sign in again")}
+  if(!r.ok)throw new Error(j.message||("Request failed ("+r.status+")"));
+  return j;
+}
+function toast(msg,kind="ok"){const t=document.createElement("div");t.className="toast "+kind;t.textContent=msg;$("#toasts").appendChild(t);setTimeout(()=>{t.style.transition=".4s";t.style.opacity=0;setTimeout(()=>t.remove(),400)},3200)}
+async function guard(btn,fn){const old=btn&&btn.innerHTML;if(btn){btn.disabled=true;btn.innerHTML='<span class="sp"></span>'+(btn.dataset.busy||"Working…")}try{return await fn()}catch(e){toast(e.message,"bad")}finally{if(btn){btn.disabled=false;btn.innerHTML=old}}}
+function confetti(){
+  const c=$("#fx"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;
+  const cols=["#7c5cff","#22d3ee","#ff4d8d","#ffb84d","#2fe39a"];
+  const P=Array.from({length:150},()=>({x:innerWidth/2,y:innerHeight/2.4,vx:(Math.random()-.5)*16,vy:Math.random()*-15-3,s:Math.random()*8+4,c:cols[Math.random()*5|0],r:Math.random()*6,vr:(Math.random()-.5)*.4}));
+  let f=0;(function step(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.vy+=.45;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);x.restore()});if(++f<130)requestAnimationFrame(step);else x.clearRect(0,0,c.width,c.height)})();
+}
+function countUps(){$$("[data-count]").forEach(el=>{const to=+el.dataset.count,t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/900),e=1-Math.pow(1-k,3);el.textContent=num(Math.round(to*e));if(k<1)requestAnimationFrame(f)})(t0)})}
+function animateBars(){requestAnimationFrame(()=>$$("[data-w]").forEach(b=>b.style.width=b.dataset.w+"%"))}
+
+/* ---------- data binding ---------- */
+function resolve(path){const ks=path.split(".");let o=ks[0]==="W"?W:ks[0]==="D"?S.dayRow:ks[0]==="G"?S.gen:S.acct;for(let i=1;i<ks.length-1;i++)o=o[ks[i]];return[o,ks[ks.length-1]]}
+const getp=p=>{const[o,k]=resolve(p);return o[k]};
+const setp=(p,v)=>{const[o,k]=resolve(p);o[k]=v};
+function markDirty(){S.dirty=true;$("#savebar").classList.add("show")}
+function onBind(e){
+  const el=e.target.closest("[data-b]");if(!el)return;
+  const p=el.dataset.b,t=el.dataset.t;
+  let v=el.type==="checkbox"?el.checked:el.value;
+  if(t==="n")v=v===""?0:Number(v);else if(t==="nn")v=v===""?null:Number(v);
+  setp(p,v);
+  if(p.startsWith("acct."))markDirty();
+  live(p);
+}
+document.addEventListener("input",onBind);document.addEventListener("change",onBind);
+let pvT;function live(p){
+  if(p.startsWith("acct.doc.opportunity_score")){const s=getp("acct.doc.opportunity_score");$("#ringBox")&&($("#ringBox").innerHTML=ringSVG(s));$("#scoreOut")&&($("#scoreOut").textContent=s)}
+  if(p.startsWith("acct.doc.spend_cap"))updateSpend();
+  if(p.startsWith("W.camp.ads")||p.startsWith("W.camp.name")){clearTimeout(pvT);pvT=setTimeout(refreshPreview,350)}
+}
+function lifetime(doc){return doc.campaigns.reduce((a,c)=>a+Object.values(c.daily||{}).reduce((s,r)=>s+(+r.spend||0),0),0)}
+function updateSpend(){const d=S.acct.doc,sp=lifetime(d),cap=+d.spend_cap||0,pct=cap>0?Math.min(100,sp/cap*100):0;const b=$("#spendBar");if(b){b.style.width=pct+"%";b.parentElement.classList.toggle("hot",pct>=80)}const o=$("#spendTxt");if(o)o.textContent=cap>0?`${money(sp,d.currency)} of ${money(cap,d.currency)} (${pct.toFixed(0)}%)`:`${money(sp,d.currency)} spent · no limit set`}
+function ringSVG(s){const r=42,c=2*Math.PI*r;return`<svg width="96" height="96" viewBox="0 0 100 100"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs><circle cx="50" cy="50" r="${r}" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="9"/><circle cx="50" cy="50" r="${r}" fill="none" stroke="url(#rg)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-Math.max(0,Math.min(100,s))/100)}" style="transition:stroke-dashoffset .8s"/></svg><b>${s}</b>`}
+
+/* ---------- auth ---------- */
+function showLogin(){$("#app").hidden=true;$("#login").hidden=false;const s=S.session;const w=$("#setupWarn");if(s&&s.configured===false){w.hidden=false;w.textContent="Server setup incomplete. Add these environment variables in Render and redeploy: "+(s.missing||[]).join(", ")}else w.hidden=true;setTimeout(()=>$("#lp").focus(),50)}
+$("#eye").onclick=()=>{const p=$("#lp");p.type=p.type==="password"?"text":"password"};
+$("#loginForm").onsubmit=async e=>{
+  e.preventDefault();const b=$("#loginBtn");$("#loginErr").textContent="";b.disabled=true;b.innerHTML='<span class="sp"></span>Signing in…';
+  try{await api("/admin/login","POST",{username:$("#lu").value.trim(),password:$("#lp").value});S.session.authed=true;S.session.user=$("#lu").value.trim();$("#lp").value="";await enter()}
+  catch(err){$("#loginErr").textContent=err.message;const c=$("#loginCard");c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake")}
+  finally{b.disabled=false;b.textContent="Sign in"}
+};
+async function enter(){$("#login").hidden=true;$("#app").hidden=false;await loadOverview();go(S.tab)}
+async function logout(){try{await api("/admin/logout","POST",{})}catch(e){}S.acct=null;S.dirty=false;$("#savebar").classList.remove("show");showLogin()}
+async function loadOverview(){S.ov=await api("/admin/api/overview")}
+async function loadDemos(){S.demos=(await api("/admin/api/demo")).accounts}
+
+/* ---------- navigation ---------- */
+function go(tab){
+  if(S.dirty&&S.tab==="demo"&&tab!=="demo"&&!confirm("You have unsaved changes. Leave without saving?"))return;
+  if(S.dirty&&tab!=="demo"){S.dirty=false;$("#savebar").classList.remove("show")}
+  S.tab=tab;$$(".nav[data-tab]").forEach(n=>n.classList.toggle("on",n.dataset.tab===tab));render();scrollTo({top:0})
+}
+async function render(){
+  const m=$("#main");
+  if(S.tab==="overview"){await loadOverview();return viewOverview()}
+  if(S.tab==="licenses"){m.innerHTML='<div class="sk"></div>';await loadOverview();return viewLicenses()}
+  if(S.tab==="demo"){if(!S.acct){m.innerHTML='<div class="sk"></div>';await loadDemos();return viewDemoList()}return viewEditor()}
+  if(S.tab==="settings"){await loadOverview();return viewSettings()}
+}
+window.addEventListener("beforeunload",e=>{if(S.dirty){e.preventDefault();e.returnValue=""}});
+
+/* ---------- overview ---------- */
+function viewOverview(){
+  const st=S.ov.stats,h=new Date().getHours(),greet=h<12?"Good morning":h<18?"Good afternoon":"Good evening";
+  let nudge;
+  if(!st.demo_accounts)nudge=["🧪","Create your first test account","It takes 10 seconds and gives you a full ads account with sample numbers to test the app with.","demo","Create test account"];
+  else if(!st.total_keys)nudge=["🔑","Create your first license","Pick a name, a profile photo and a test account. Your app will show them instantly.","licenses","Create license"];
+  else nudge=["🚀","Everything is ready","Edit daily numbers, change the spending limit or the opportunity score, then open the app to see it update.","demo","Open test data"];
+  $("#main").innerHTML=`<div class="view">
+  <div class="top up"><div><h1>${greet}, Dr. Dev 👋</h1><p class="muted" style="margin:6px 0 0">Here is your app at a glance.</p></div>
+  <div class="row"><span class="badge ${S.ov.maintenance.maintenance?"expired":"live"}">${S.ov.maintenance.maintenance?"● Maintenance ON":"● App online"}</span></div></div>
+  <div class="grid g3">
+   ${[["Total users",st.total_users,""],["License keys",st.total_keys,"cool"],["Live",st.live,"cool"],["Expired",st.expired,"warm"],["Blocked devices",st.blocked_devices,"warm"],["Test accounts",st.demo_accounts,""]].map((x,i)=>`<div class="glass stat up ${x[2]}" style="--i:${i}"><div class="n" data-count="${x[1]}">0</div><div class="l">${x[0]}</div></div>`).join("")}
+  </div><div style="height:18px"></div>
+  <div class="nudge up" style="--i:6"><div class="e">${nudge[0]}</div><div class="grow"><h3>${nudge[1]}</h3><div class="muted small">${nudge[2]}</div></div><button class="btn primary" data-act="nav" data-tab="${nudge[3]}">${nudge[4]} →</button></div></div>`;
+  countUps();
+}
+
+/* ---------- licenses ---------- */
+function viewLicenses(){
+  const L=S.ov.licenses,D=S.ov.demos,d30=addDays(todayIST(),30);
+  $("#main").innerHTML=`<div class="view">
+  <div class="top up"><div><h1>Licenses</h1><p class="muted" style="margin:6px 0 0">Each key unlocks the app for one device.</p></div></div>
+  <div class="glass pad up" style="--i:1"><h3 style="margin-bottom:14px">✨ Create license</h3>
+   <div class="grid g3">
+    <label class="field"><span>User name <small>(shown in the app)</small></span><input id="cl_name" placeholder="e.g. Aarav Sharma" maxlength="60"></label>
+    <label class="field"><span>Profile icon URL <small>(optional)</small></span><div class="row" style="flex-wrap:nowrap"><div id="cl_av">${avatar("","?")}</div><input id="cl_img" placeholder="https://…/photo.jpg"></div></label>
+    <label class="field"><span>Data account</span><select id="cl_demo"><option value="">— None (user connects their own Meta account) —</option>${D.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join("")}</select></label>
+    <label class="field"><span>Valid until</span><input id="cl_date" type="date" value="${d30}" min="${todayIST()}"></label>
+    <label class="field"><span>How many keys</span><input id="cl_cnt" type="number" min="1" max="50" value="1"></label>
+    <label class="field"><span>Note <small>(private)</small></span><input id="cl_note" maxlength="60" placeholder="Optional"></label>
+   </div>
+   <div class="row" style="margin-top:16px"><button class="btn primary" data-act="mkLicense" data-busy="Creating…">Generate license key</button><span class="muted small">Tip: choose a data account so the app opens with real-looking numbers right away.</span></div>
+   <div id="newKeys" hidden style="margin-top:14px"></div>
+  </div>
+  <div class="glass up" style="margin-top:18px;--i:2"><div class="tablewrap"><table><thead><tr><th>User</th><th>Key</th><th>Data</th><th>Status</th><th>Valid until</th><th>Device</th><th>Last seen</th><th></th></tr></thead><tbody>
+  ${L.length?L.map(l=>`<tr class="hov"><td><div class="row" style="flex-wrap:nowrap;gap:10px">${avatar(l.avatar_url,l.name)}<div><b>${esc(l.name||"—")}</b><div class="muted small">${esc(l.note||"")}</div></div></div></td>
+   <td class="key">${esc(l.key)}</td><td>${l.demo?`🧪 ${esc(l.demo_name||l.demo)}`:'<span class="muted">Own Meta account</span>'}</td>
+   <td><span class="badge ${l.status}">${l.status}</span></td><td>${fmtDate(l.expires_at)}</td><td>${l.bound?"Bound "+esc(l.device):'<span class="muted">Not used</span>'}</td><td>${fmtTime(l.last_seen)}</td>
+   <td><div class="actions"><button class="btn sm" data-act="copyKey" data-k="${l.key}">Copy</button><button class="btn sm" data-act="editLic" data-k="${l.key}">Edit</button><button class="btn sm" data-act="extend" data-k="${l.key}">Extend</button>${l.bound?`<button class="btn sm" data-act="resetDev" data-k="${l.key}">Reset device</button>`:""}<button class="btn sm" data-act="revoke" data-k="${l.key}" data-r="${l.revoked?0:1}">${l.revoked?"Restore":"Revoke"}</button><button class="btn sm danger" data-act="delLic" data-k="${l.key}">Delete</button></div></td></tr>`).join(""):'<tr><td colspan="8" class="muted" style="padding:30px;text-align:center">No license keys yet. Create your first one above 👆</td></tr>'}
+  </tbody></table></div></div></div>`;
+  $("#cl_img").oninput=e=>{$("#cl_av").innerHTML=avatar(e.target.value.trim(),$("#cl_name").value)};
+}
+function modal(html,cls=""){const o=document.createElement("div");o.className="overlay";o.innerHTML=`<div class="modal glass ${cls}">${html}</div>`;o.addEventListener("mousedown",e=>{if(e.target===o&&!cls.includes("wiz"))o.remove()});$("#layer").appendChild(o);return o}
+function closeModal(){$$("#layer .overlay").pop()?.remove()}
+async function copyText(t){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove()}toast("Copied")}
+
+/* ---------- demo accounts: list ---------- */
+function viewDemoList(){
+  $("#main").innerHTML=`<div class="view"><div class="top up"><div><h1>Demo data</h1><p class="muted" style="margin:6px 0 0">Build ads accounts with campaigns and daily numbers, then link them to a license.</p></div><button class="btn primary" data-act="newDemo">➕ New data account</button></div>
+  <div class="cards">${S.demos.map((a,i)=>`<div class="glass acard up" style="--i:${i}" data-act="openAcct" data-id="${a.id}"><div class="row" style="flex-wrap:nowrap"><div class="avatar" style="background:var(--g1);font-size:20px">🧪</div><div class="grow"><b>${esc(a.name)}</b><div class="muted small">${a.campaigns} campaign${a.campaigns==1?"":"s"} · updated ${fmtTime(a.updated)}</div></div></div><div class="row" style="margin-top:14px"><button class="btn sm primary">Open &amp; edit</button><button class="btn sm danger" data-act="delAcct" data-id="${a.id}">Delete</button></div></div>`).join("")||'<div class="glass pad muted" style="text-align:center;grid-column:1/-1">No data accounts yet. Create one and it comes with sample campaigns and 45 days of numbers.</div>'}</div></div>`;
+}
+async function openAcct(id){
+  const j=await api("/admin/api/demo/"+id);const t=j.today;
+  S.acct={id,doc:j.doc,today:t};S.sample=j.sample_video;S.dirty=false;S.sub="account";S.day={ci:0,date:t};
+  S.gen={start:addDays(t,-29),end:t,spend:30000,reach:200000,impressions:280000,clicks:2200,unique_clicks:1700,results:1400};
+  loadDay();render()
+}
+function loadDay(){const c=S.acct.doc.campaigns[S.day.ci];S.dayRow=c?Object.assign({spend:0,reach:0,impressions:0,clicks:0,unique_clicks:0,results:0},c.daily[S.day.date]||{}):null}
+async function saveDoc(){const r=await api("/admin/api/demo/"+S.acct.id,"PUT",S.acct.doc);S.acct.doc=r.doc;S.dirty=false;$("#savebar").classList.remove("show");toast("Saved ✓ — the app will show it on its next refresh")}
+
+/* ---------- editor ---------- */
+function viewEditor(){
+  const d=S.acct.doc;
+  $("#main").innerHTML=`<div class="view"><div class="top up"><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-act="back">← All accounts</button><div><h1>${esc(d.name)}</h1><div class="muted small">Account ${S.acct.id}</div></div></div><button class="btn primary" data-act="saveDoc">💾 Save changes</button></div>
+  <div class="tabs up" style="--i:1" id="subtabs"></div><div id="sub"></div></div>`;
+  viewSub();
+}
+function viewSub(){
+  $("#subtabs").innerHTML=[["account","⚙️ Account"],["campaigns","📣 Campaigns"],["daily","📅 Daily numbers"]].map(t=>`<div class="tab ${S.sub===t[0]?"on":""}" data-act="sub" data-s="${t[0]}">${t[1]}</div>`).join("");
+  ({account:subAccount,campaigns:subCampaigns,daily:subDaily})[S.sub]();
+}
+function subAccount(){
+  const d=S.acct.doc;
+  $("#sub").innerHTML=`<div class="grid g2"><div class="glass pad up"><h3 style="margin-bottom:14px">Account details</h3><div class="grid">
+   <label class="field"><span>Internal name <small>(only you see this)</small></span><input data-b="acct.doc.name" value="${esc(d.name)}" maxlength="80"></label>
+   <div class="grid g2"><label class="field"><span>Currency</span><select data-b="acct.doc.currency">${["INR","USD","EUR","GBP","AED","JPY","BDT","PKR"].map(c=>`<option ${c===d.currency?"selected":""}>${c}</option>`).join("")}</select></label>
+   <label class="field"><span>Spending limit <small>(0 = none)</small></span><input type="number" min="0" step="any" data-b="acct.doc.spend_cap" data-t="n" value="${d.spend_cap}"></label></div>
+   <div><div class="small muted" style="font-weight:700">Spending-limit bar shown on the app's home screen</div><div class="bar" style="margin:8px 0"><i id="spendBar" style="width:0"></i></div><div class="small muted" id="spendTxt"></div></div></div></div>
+  <div class="glass pad up" style="--i:1"><h3 style="margin-bottom:14px">Opportunity score</h3><div class="row" style="flex-wrap:nowrap;gap:20px"><div class="ring" id="ringBox">${ringSVG(d.opportunity_score)}</div><div class="grow"><input type="range" min="0" max="100" data-b="acct.doc.opportunity_score" data-t="n" value="${d.opportunity_score}"><div class="muted small" style="margin-top:8px">The app shows <b id="scoreOut">${d.opportunity_score}</b> points.</div></div></div></div></div>
+  <div class="glass pad up" style="margin-top:14px;--i:2"><div class="row" style="justify-content:space-between;margin-bottom:12px"><h3>Recommendations shown in the app</h3><button class="btn sm" data-act="addRec">➕ Add</button></div>
+  ${d.recommendations.length?d.recommendations.map((r,i)=>`<div class="glass pad" style="background:rgba(255,255,255,.04);margin-bottom:12px"><div class="grid g2"><label class="field"><span>Title</span><input data-b="acct.doc.recommendations.${i}.type" value="${esc(r.type)}"></label><label class="field"><span>Points gained</span><input type="number" min="0" max="100" data-b="acct.doc.recommendations.${i}.points" data-t="n" value="${r.points}"></label></div><label class="field" style="margin-top:10px"><span>Description</span><input data-b="acct.doc.recommendations.${i}.body" value="${esc(r.body)}"></label><label class="field" style="margin-top:10px"><span>Estimated lift</span><input data-b="acct.doc.recommendations.${i}.lift" value="${esc(r.lift)}"></label><div style="margin-top:10px"><button class="btn sm danger" data-act="delRec" data-i="${i}">Remove</button></div></div>`).join(""):'<div class="muted small">No recommendations. The app will show "0 recommendations".</div>'}</div>`;
+  requestAnimationFrame(updateSpend);
+}
+function campTotals(c){const t={spend:0,reach:0,impressions:0,clicks:0,unique_clicks:0,results:0};Object.values(c.daily||{}).forEach(r=>{for(const k in t)t[k]+=+r[k]||0});return t}
+function sumRange(c,a,b){const t={spend:0,reach:0,impressions:0,clicks:0,unique_clicks:0,results:0};for(const[d,r]of Object.entries(c.daily||{})){if((a&&d<a)||(b&&d>b))continue;for(const k in t)t[k]+=+r[k]||0}return t}
+function subCampaigns(){
+  const d=S.acct.doc;
+  $("#sub").innerHTML=`<div class="row" style="margin-bottom:14px"><button class="btn warm" data-act="newCamp">➕ New campaign (step by step)</button><span class="muted small">${d.campaigns.length} campaign${d.campaigns.length==1?"":"s"}</span></div><div class="grid">
+  ${d.campaigns.map((c,i)=>{const t=campTotals(c),o=OBJ[c.objective]||["📣","",""];return`<div class="glass camp up" style="--i:${i}"><div class="row" style="justify-content:space-between"><div class="row" style="flex-wrap:nowrap"><div class="avatar" style="background:var(--g1);font-size:20px">${o[0]}</div><div><b>${esc(c.name)}</b><div class="muted small">${o[1]} · ${c.adsets.length} ad set · ${c.ads.length} ad</div></div></div><div class="row" style="gap:8px"><span class="small muted">${c.status==="ACTIVE"?"Active":c.status==="PAUSED"?"Paused":"Archived"}</span><span class="switch"><input type="checkbox" ${c.status==="ACTIVE"?"checked":""} data-act="campStatus" data-i="${i}"><i></i></span></div></div>
+  <div class="grid g6 keep2">${[["Spent",money(t.spend,d.currency)],[RESULTS[c.result_action]||"Results",num(t.results)],["Reach",num(t.reach)],["Impressions",num(t.impressions)],["Clicks",num(t.clicks)],["Unique clicks",num(t.unique_clicks)]].map(m=>`<div class="metric"><b>${m[1]}</b><span>${esc(m[0])}</span></div>`).join("")}</div>
+  <div class="actions"><button class="btn sm primary" data-act="editCamp" data-i="${i}">✏️ Edit everything</button><button class="btn sm" data-act="dayFor" data-i="${i}">📅 Daily numbers</button><button class="btn sm" data-act="dupCamp" data-i="${i}">Duplicate</button><button class="btn sm danger" data-act="delCamp" data-i="${i}">Delete</button></div></div>`}).join("")||'<div class="glass pad muted" style="text-align:center">No campaigns yet. Create the first one 👆</div>'}</div>`;
+}
+function subDaily(){
+  const d=S.acct.doc;
+  if(!d.campaigns.length){$("#sub").innerHTML='<div class="glass pad muted" style="text-align:center">Create a campaign first, then add its daily numbers here.</div>';return}
+  if(S.day.ci>=d.campaigns.length){S.day.ci=0;loadDay()}
+  const c=d.campaigns[S.day.ci],t=todayIST();
+  const rows=Object.keys(c.daily).sort().reverse().slice(0,45);
+  const presets=[["Today",t,t],["Yesterday",addDays(t,-1),addDays(t,-1)],["Last 7 days",addDays(t,-7),addDays(t,-1)],["Last 30 days",addDays(t,-30),addDays(t,-1)],["This week",addDays(t,-wday(t)),t],["This month",t.slice(0,8)+"01",t],["Maximum",null,null]];
+  const F2=[["spend","Amount spent ("+(CUR[d.currency]||d.currency)+")","0.01"],["reach","Reach","1"],["impressions","Impressions","1"],["clicks","Link clicks","1"],["unique_clicks","Unique clicks","1"],["results","Results ("+(RESULTS[c.result_action]||"count")+")","1"]];
+  const G=[["spend","Total spent","0.01"],["reach","Total reach","1"],["impressions","Impressions","1"],["clicks","Clicks","1"],["unique_clicks","Unique clicks","1"],["results","Results","1"]];
+  $("#sub").innerHTML=`<div class="grid g2"><div class="glass pad up"><h3 style="margin-bottom:14px">📅 Edit one day</h3><div class="grid">
+   <label class="field"><span>Campaign</span><select data-chg="dayCamp">${d.campaigns.map((x,i)=>`<option value="${i}" ${i===S.day.ci?"selected":""}>${esc(x.name)}</option>`).join("")}</select></label>
+   <label class="field"><span>Date <small>(pick any day to add or fix its numbers)</small></span><div class="row" style="flex-wrap:nowrap"><input type="date" data-chg="dayDate" value="${S.day.date}" max="${t}"><button class="btn sm" data-act="dayQuick" data-n="0">Today</button><button class="btn sm" data-act="dayQuick" data-n="-1">Yesterday</button></div></label>
+   <div class="grid g2">${F2.map(f=>`<label class="field"><span>${f[1]}</span><input type="number" min="0" step="${f[2]}" data-b="D.${f[0]}" data-t="n" value="${S.dayRow[f[0]]}"></label>`).join("")}</div>
+   <div class="row"><button class="btn primary" data-act="saveDay">Save this day</button><button class="btn" data-act="randDay">🎲 Fill realistic numbers</button><button class="btn sm danger" data-act="delDay">Clear day</button></div></div></div>
+  <div class="glass pad up" style="--i:1"><h3 style="margin-bottom:6px">👀 What the app will show</h3><div class="muted small" style="margin-bottom:12px">Same date filters as the app, calculated from your daily numbers.</div><div class="grid">
+   ${presets.map(p=>{const s=sumRange(c,p[1],p[2]);return`<div class="metric" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span style="font-size:13.5px;color:var(--text);font-weight:700">${p[0]}</span><span style="font-size:12.5px"><b style="display:inline;font-size:14px">${money(s.spend,d.currency)}</b> · ${num(s.results)} results · ${num(s.reach)} reach</span></div>`}).join("")}</div></div></div>
+  <div class="glass pad up" style="margin-top:14px;--i:2"><h3 style="margin-bottom:12px">⚡ Generate history for this campaign</h3><div class="grid g4 keep2" style="align-items:end">
+   <label class="field"><span>From</span><input type="date" data-b="G.start" value="${S.gen.start}"></label><label class="field"><span>To</span><input type="date" data-b="G.end" value="${S.gen.end}" max="${t}"></label>
+   ${G.map(f=>`<label class="field"><span>${f[1]}</span><input type="number" min="0" step="${f[2]}" data-b="G.${f[0]}" data-t="n" value="${S.gen[f[0]]}"></label>`).join("")}</div>
+   <div class="row" style="margin-top:14px"><button class="btn warm" data-act="genDaily" data-busy="Generating…">Generate &amp; replace these dates</button><button class="btn sm danger" data-act="clearAllDays">Clear all days</button></div></div>
+  <div class="glass up" style="margin-top:14px;--i:3"><div class="tablewrap"><table style="min-width:640px"><thead><tr><th>Date</th><th>Spent</th><th>Reach</th><th>Impressions</th><th>Clicks</th><th>Unique</th><th>Results</th><th></th></tr></thead><tbody>
+   ${rows.map(k=>{const r=c.daily[k];return`<tr class="hov"><td>${k}</td><td>${money(r.spend,d.currency)}</td><td>${num(r.reach)}</td><td>${num(r.impressions)}</td><td>${num(r.clicks)}</td><td>${num(r.unique_clicks)}</td><td>${num(r.results)}</td><td><button class="btn sm" data-act="pickDay" data-d="${k}">Edit</button></td></tr>`}).join("")||'<tr><td colspan="8" class="muted" style="text-align:center;padding:24px">No daily numbers yet.</td></tr>'}</tbody></table></div></div>`;
+}
+
+/* ---------- wizard ---------- */
+const STEPS=["Basics","Budget & schedule","Audience","Ad creative","Performance data","Review"];
+const newAdset=n=>({name:n||"",status:"ACTIVE",daily_budget:1000,bid_strategy:"LOWEST_COST_WITHOUT_CAP",start_time:todayIST(),end_time:"",countries:["IN"],age_min:18,age_max:65,genders:0,interests:[],placements:{auto:false,platforms:["facebook","instagram"],facebook:[],instagram:[]},expansion:false});
+const newAd=n=>({name:n||"",status:"ACTIVE",profile_name:"",profile_image:"",message:"",headline:"",link_url:"https://",link_display:"",cta:"LEARN_MORE",video_url:S.sample,thumb_url:"",reactions:{like:0,love:0,haha:0},comments:0,shares:0});
+function openWizard(i){
+  const d=S.acct.doc,t=todayIST();
+  const camp=i<0?{name:"",objective:"OUTCOME_LEADS",status:"ACTIVE",result_action:"subscribe_website",daily_budget:null,adsets:[newAdset()],ads:[newAd()],daily:{}}:clone(d.campaigns[i]);
+  if(!camp.adsets.length)camp.adsets.push(newAdset(camp.name));
+  if(!camp.ads.length)camp.ads.push(newAd());
+  W={mode:i<0?"new":"edit",idx:i,step:0,camp,gen:{mode:i<0?"gen":"keep",start:addDays(t,-29),end:t,spend:30000,reach:200000,impressions:280000,clicks:2200,unique_clicks:1700,results:1400}};
+  modal('<div id="wizRoot"></div>',"wiz");wizRender();
+}
+const cs=()=>CUR[S.acct.doc.currency]||S.acct.doc.currency;
+const fv=p=>esc(getp(p)??"");
+const FLD=(label,path,o={})=>`<label class="field"><span>${label}</span><input type="${o.type||"text"}" data-b="${path}" ${o.t?`data-t="${o.t}"`:""} value="${fv(path)}" placeholder="${esc(o.ph||"")}" ${o.x||""}></label>`;
+const tagsH=(path,ph,up)=>{const a=getp(path)||[];return`<div class="tags">${a.map((x,i)=>`<span class="tag">${esc(x)}<u data-act="tagDel" data-p="${path}" data-i="${i}">✕</u></span>`).join("")}<input data-tagin="${path}" ${up?'data-up="1"':""} placeholder="${esc(ph)}"></div>`};
+const chipsH=(path,map)=>{const a=getp(path)||[];return Object.entries(map).map(([k,l])=>`<span class="chip ${a.includes(k)?"on":""}" data-act="tog" data-p="${path}" data-v="${k}">${l}</span>`).join("")};
+function st0(){const c=W.camp;return`<div class="grid">${FLD("Campaign name *","W.camp.name",{ph:"e.g. Diwali Subscribers Boost"})}
+ <div><div class="small muted" style="font-weight:700;margin-bottom:8px">What is the goal?</div><div class="grid g3">${Object.entries(OBJ).map(([k,v])=>`<div class="opt ${c.objective===k?"on":""}" data-act="obj" data-v="${k}"><div style="font-size:26px">${v[0]}</div><b>${v[1]}</b><div class="muted small">${v[2]}</div></div>`).join("")}</div></div>
+ <div class="grid g2"><label class="field"><span>Result the app counts</span><select data-b="W.camp.result_action">${Object.entries(RESULTS).map(([k,l])=>`<option value="${k}" ${c.result_action===k?"selected":""}>${l}</option>`).join("")}</select></label>
+ <div class="field"><span>Status</span><div class="row">${[["ACTIVE","Active"],["PAUSED","Paused"]].map(s=>`<span class="chip ${c.status===s[0]?"on":""}" data-act="wstatus" data-v="${s[0]}">${s[1]}</span>`).join("")}</div></div></div>
+ ${FLD("Campaign-level daily budget <small>(optional)</small>","W.camp.daily_budget",{type:"number",t:"nn",ph:"Leave empty to set the budget on the ad set",x:'min="0" step="any"'})}</div>`}
+function st1(){const a="W.camp.adsets.0";return`<div class="grid g2">${FLD("Ad set name",a+".name",{ph:"Defaults to the campaign name"})}${FLD("Daily budget ("+cs()+") *",a+".daily_budget",{type:"number",t:"n",x:'min="0" step="any"'})}
+ <label class="field"><span>Bid strategy</span><select data-b="${a}.bid_strategy">${Object.entries(BIDS).map(([k,l])=>`<option value="${k}" ${getp(a+".bid_strategy")===k?"selected":""}>${l}</option>`).join("")}</select></label>
+ <div class="field"><span>Ad set status</span><div class="row">${[["ACTIVE","Active"],["PAUSED","Paused"]].map(s=>`<span class="chip ${getp(a+".status")===s[0]?"on":""}" data-act="wastatus" data-v="${s[0]}">${s[1]}</span>`).join("")}</div></div>
+ ${FLD("Start date",a+".start_time",{type:"date"})}${FLD("End date <small>(optional)</small>",a+".end_time",{type:"date"})}</div>
+ <p class="muted small" style="margin-top:14px">💡 A start date in the past lets you test history. Leave the end date empty for an ongoing campaign.</p>`}
+function st2(){const a="W.camp.adsets.0",ad=W.camp.adsets[0];return`<div class="grid">
+ <div class="field"><span>Countries <small>(2-letter codes, press Enter)</small></span>${tagsH(a+".countries","IN, US, GB…",1)}</div>
+ <div class="grid g3">${FLD("Min age",a+".age_min",{type:"number",t:"n",x:'min="13" max="65"'})}${FLD("Max age",a+".age_max",{type:"number",t:"n",x:'min="13" max="65"'})}
+ <div class="field"><span>Gender</span><div class="row">${[[0,"All"],[1,"Men"],[2,"Women"]].map(g=>`<span class="chip ${ad.genders===g[0]?"on":""}" data-act="wgender" data-v="${g[0]}">${g[1]}</span>`).join("")}</div></div></div>
+ <div class="field"><span>Interests <small>(type and press Enter, or tap a suggestion)</small></span>${tagsH(a+".interests","Cricket, Dancing…")}<div class="row" style="gap:8px;margin-top:6px">${INTERESTS.filter(x=>!ad.interests.includes(x)).slice(0,8).map(x=>`<span class="chip" data-act="addInterest" data-v="${esc(x)}">+ ${esc(x)}</span>`).join("")}</div></div>
+ <div class="row"><label class="switch"><input type="checkbox" ${ad.expansion?"checked":""} data-b="${a}.expansion"><i></i></label><div><b>Detailed targeting expansion</b><div class="muted small">Shown in the app as "Detailed targeting expanded"</div></div></div>
+ <div class="glass pad" style="background:rgba(255,255,255,.04)"><div class="row" style="margin-bottom:10px"><label class="switch"><input type="checkbox" ${ad.placements.auto?"checked":""} data-act="autoPl"><i></i></label><div><b>Automatic placements</b><div class="muted small">Turn off to choose where the ad runs</div></div></div>
+ ${ad.placements.auto?"":`<div class="small muted" style="font-weight:700;margin:6px 0">Platforms</div><div class="row" style="gap:8px">${chipsH(a+".placements.platforms",{facebook:"Facebook",instagram:"Instagram",audience_network:"Audience Network",messenger:"Messenger"})}</div>
+ <div class="small muted" style="font-weight:700;margin:12px 0 6px">Facebook placements</div><div class="row" style="gap:8px">${chipsH(a+".placements.facebook",FBPOS)}</div>
+ <div class="small muted" style="font-weight:700;margin:12px 0 6px">Instagram placements</div><div class="row" style="gap:8px">${chipsH(a+".placements.instagram",IGPOS)}</div>`}</div></div>`}
+function fbPreview(){
+  const ad=W.camp.ads[0],nm=ad.profile_name||"Profile name",tot=(+ad.reactions.like||0)+(+ad.reactions.love||0)+(+ad.reactions.haha||0);
+  return`<div class="fb" id="fbPrev"><div class="h"><div class="av">${ad.profile_image?`<img src="${esc(ad.profile_image)}" alt="" onerror="this.remove()">`:esc(initial(nm))}</div><div><b>${esc(nm)}</b><div style="color:#65676b;font-size:12px">Sponsored · 🌐</div></div></div>
+  <div class="t">${esc(ad.message||"Your message appears here…")}</div>${ad.video_url?`<video muted playsinline preload="metadata" src="${esc(ad.video_url)}#t=1"></video>`:'<div class="vid"></div>'}
+  <div class="lk"><div><small style="color:#65676b">${esc(ad.link_display||host(ad.link_url))}</small><b>${esc(ad.headline||"Headline")}</b></div><div class="b">${esc(CTAS[ad.cta]||"Learn more")}</div></div>
+  <div class="rx"><span>👍❤️😆 ${num(tot)}</span><span>${num(ad.comments)} comments · ${num(ad.shares)} shares</span></div><div class="ab"><div>👍 Like</div><div>💬 Comment</div><div>↗ Share</div></div></div>`;
+}
+function refreshPreview(){
+  const old=$("#fbPrev");if(!old||!W)return;const ov=old.querySelector("video"),tmp=document.createElement("div");tmp.innerHTML=fbPreview();const nw=tmp.firstElementChild,nv=nw.querySelector("video");
+  if(ov&&nv&&ov.getAttribute("src")===nv.getAttribute("src"))nv.replaceWith(ov);old.replaceWith(nw);
+}
+function st3(){const a="W.camp.ads.0";return`<div class="split"><div class="grid">
+ <div class="grid g2">${FLD("Ad name",a+".name",{ph:"Defaults to the campaign name"})}<label class="field"><span>Button</span><select data-b="${a}.cta">${Object.entries(CTAS).map(([k,l])=>`<option value="${k}" ${getp(a+".cta")===k?"selected":""}>${l}</option>`).join("")}</select></label></div>
+ <div class="glass pad" style="background:rgba(255,255,255,.04)"><div class="small muted" style="font-weight:700;margin-bottom:10px">Who posts the ad <small>(leave empty to use each user's name and photo from their license)</small></div><div class="grid g2">${FLD("Profile name",a+".profile_name",{ph:"Auto from license"})}${FLD("Profile icon URL",a+".profile_image",{ph:"Auto from license"})}</div></div>
+ <label class="field"><span>Message</span><textarea data-b="${a}.message" placeholder="Write the text people see above the video">${fv(a+".message")}</textarea></label>
+ <div class="grid g2">${FLD("Headline",a+".headline",{ph:"JOIN NOW"})}${FLD("Website link",a+".link_url",{type:"url"})}</div>
+ ${FLD("Display link <small>(shown under the video, auto if empty)</small>",a+".link_display",{ph:"example.com"})}
+ <div class="field"><span>Video URL <small>(https link to an mp4 — the app plays it)</small></span><div class="row" style="flex-wrap:nowrap"><input data-b="${a}.video_url" value="${fv(a+".video_url")}" placeholder="https://…/video.mp4"><button class="btn sm" data-act="sampleVideo">Use sample</button></div></div>
+ ${FLD("Thumbnail URL <small>(optional — the app uses the video's 1-second frame)</small>",a+".thumb_url",{ph:"https://…/thumb.jpg"})}
+ <div class="small muted" style="font-weight:700">Engagement shown under the video</div>
+ <div class="grid g3 keep2">${FLD("👍 Likes",a+".reactions.like",{type:"number",t:"n",x:'min="0"'})}${FLD("❤️ Love",a+".reactions.love",{type:"number",t:"n",x:'min="0"'})}${FLD("😆 Haha",a+".reactions.haha",{type:"number",t:"n",x:'min="0"'})}${FLD("💬 Comments",a+".comments",{type:"number",t:"n",x:'min="0"'})}${FLD("↗ Shares",a+".shares",{type:"number",t:"n",x:'min="0"'})}</div></div>
+ <div><div class="small muted" style="font-weight:700;margin-bottom:8px">Live preview</div><div id="pvBox">${fbPreview()}</div></div></div>`}
+function st4(){const g=W.gen,modes=[...(W.mode==="edit"?[["keep","Keep existing numbers","Daily numbers stay exactly as they are"]]:[]),["gen","Generate history","Fill a date range with natural-looking daily numbers"],...(W.mode==="new"?[["zero","Start from zero","Add numbers day by day later"]]:[])];
+ return`<div class="grid"><div class="grid g3">${modes.map(m=>`<div class="opt ${g.mode===m[0]?"on":""}" data-act="genMode" data-v="${m[0]}"><b>${m[1]}</b><div class="muted small">${m[2]}</div></div>`).join("")}</div>
+ ${g.mode==="gen"?`<div class="grid g4 keep2">${FLD("From","W.gen.start",{type:"date"})}${FLD("To","W.gen.end",{type:"date",x:'max="'+todayIST()+'"'})}${FLD("Total spent ("+cs()+")","W.gen.spend",{type:"number",t:"n"})}${FLD("Total reach","W.gen.reach",{type:"number",t:"n"})}${FLD("Impressions","W.gen.impressions",{type:"number",t:"n"})}${FLD("Link clicks","W.gen.clicks",{type:"number",t:"n"})}${FLD("Unique clicks","W.gen.unique_clicks",{type:"number",t:"n"})}${FLD("Results","W.gen.results",{type:"number",t:"n"})}</div><p class="muted small">The totals are split across the dates and always add up exactly. You can fine-tune every day later in Daily numbers.</p>`:""}</div>`}
+function st5(){const c=W.camp,a=c.adsets[0],ad=c.ads[0],o=OBJ[c.objective];
+ const row=(k,v)=>`<div class="metric" style="display:flex;justify-content:space-between;gap:12px"><span>${k}</span><b style="font-size:14px;text-align:right">${v}</b></div>`;
+ return`<div class="nudge" style="margin-bottom:16px"><div class="e">🎉</div><div class="grow"><h3>${W.mode==="new"?"Ready to launch":"Ready to save"}</h3><div class="muted small">Check the summary, then ${W.mode==="new"?"create the campaign":"save"}. You can change anything later.</div></div></div>
+ <div class="grid g2"><div class="grid">${row("Campaign",esc(c.name))}${row("Goal",o[0]+" "+o[1])}${row("Counted result",RESULTS[c.result_action]||"")}${row("Status",c.status)}${row("Daily budget",money(c.daily_budget||a.daily_budget,S.acct.doc.currency))}${row("Schedule",esc(a.start_time)+" → "+esc(a.end_time||"ongoing"))}</div>
+ <div class="grid">${row("Audience",esc(a.countries.join(", "))+" · "+a.age_min+"–"+a.age_max+" · "+["All","Men","Women"][a.genders])}${row("Interests",esc(a.interests.join(", ")||"—"))}${row("Placements",a.placements.auto?"Automatic":esc(a.placements.platforms.join(", ")))}${row("Posted as",esc(ad.profile_name||"License name"))}${row("Video",ad.video_url?"✅ added":"—")}${row("Engagement",num((+ad.reactions.like||0)+(+ad.reactions.love||0)+(+ad.reactions.haha||0))+" reactions · "+num(ad.comments)+" comments · "+num(ad.shares)+" shares")}</div></div>`}
+function wizRender(){
+  const root=$("#wizRoot");if(!root||!W)return;const n=STEPS.length,s=W.step;
+  root.innerHTML=`<div class="wiz-head"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><div><h2>${W.mode==="new"?"Create campaign":"Edit campaign"}</h2><div class="muted small">Step ${s+1} of ${n} · ${STEPS[s]}${s>=3?" · almost there! 🎉":""}</div></div><button class="btn sm" data-act="wizClose">✕</button></div><div class="steps">${STEPS.map((x,i)=>`<i class="${i<s?"done":i===s?"now":""}"></i>`).join("")}</div></div>
+  <div class="wiz-body" id="wizBody">${[st0,st1,st2,st3,st4,st5][s]()}</div>
+  <div class="wiz-foot"><button class="btn" data-act="wizBack" ${s===0?"disabled":""}>← Back</button><span class="muted small">${Math.round(s/(n-1)*100)}% complete</span>${s<n-1?'<button class="btn primary" data-act="wizNext">Next →</button>':`<button class="btn warm" data-act="wizFinish" data-busy="Saving…">${W.mode==="new"?"🚀 Create campaign":"💾 Save changes"}</button>`}</div>`;
+}
+function wizCheck(){const c=W.camp,a=c.adsets[0],ad=c.ads[0],s=W.step;
+  if(s===0&&!c.name.trim())return"Give the campaign a name";
+  if(s===1&&!(a.daily_budget>0)&&!(c.daily_budget>0))return"Enter a daily budget";
+  if(s===1&&a.end_time&&a.end_time<a.start_time)return"End date must be after the start date";
+  if(s===2&&!a.countries.length)return"Add at least one country, for example IN";
+  if(s===2&&a.age_min>a.age_max)return"Minimum age cannot be above maximum age";
+  if(s===3&&ad.video_url&&!/^https?:\/\//.test(ad.video_url))return"The video link must start with https://";
+  if(s===4&&W.gen.mode==="gen"&&W.gen.end<W.gen.start)return"The end date must be after the start date";
+  return""}
+
+/* ---------- app control ---------- */
+function viewSettings(){
+  const m=S.ov.maintenance;
+  $("#main").innerHTML=`<div class="view"><div class="top up"><div><h1>App control</h1><p class="muted" style="margin:6px 0 0">Switch the whole app on or off and unblock devices.</p></div></div>
+  <div class="glass pad up" style="--i:1"><h3>🛠 Maintenance mode</h3><p class="muted small">When ON, the app stops working for everyone and shows your message in a dialog.</p>
+  <div class="row" style="margin:14px 0"><span class="switch"><input type="checkbox" id="m_on" ${m.maintenance?"checked":""}><i></i></span><b id="m_lbl">${m.maintenance?"ON — the app is disabled":"OFF — the app is online"}</b></div>
+  <label class="field"><span>Message shown in the app</span><textarea id="m_msg">${esc(m.message)}</textarea></label>
+  <div class="row" style="margin-top:14px"><button class="btn primary" data-act="saveMaint" data-busy="Saving…">Save</button><button class="btn" data-act="unblockAll">Unblock all devices</button></div></div></div>`;
+  $("#m_on").onchange=e=>{$("#m_lbl").textContent=e.target.checked?"ON — the app is disabled":"OFF — the app is online"};
+}
+
+/* ---------- actions ---------- */
+const stripIds=c=>{delete c.id;c.adsets.forEach(a=>delete a.id);c.ads.forEach(a=>{delete a.id;delete a.adset_id});return c};
+const ACT={
+  nav:el=>go(el.dataset.tab),
+  logout:()=>logout(),
+  discard:async()=>{S.dirty=false;$("#savebar").classList.remove("show");if(S.acct)await openAcct(S.acct.id)},
+  saveDoc:el=>guard(el,async()=>{await saveDoc();if(S.tab==="demo"&&S.acct)viewEditor()}),
+  /* licenses */
+  mkLicense:el=>guard(el,async()=>{
+    const r=await api("/admin/api/licenses","POST",{name:$("#cl_name").value.trim(),avatar_url:$("#cl_img").value.trim(),demo_account:$("#cl_demo").value,valid_until:$("#cl_date").value,count:+$("#cl_cnt").value||1,note:$("#cl_note").value.trim()});
+    S.newKeys=r.keys;await loadOverview();viewLicenses();
+    const b=$("#newKeys");b.hidden=false;b.innerHTML=`<div class="nudge"><div class="e">🎉</div><div class="grow"><b>${r.keys.length>1?"Your keys are ready":"Your key is ready"}</b><div class="key" style="margin-top:6px;white-space:pre-line">${r.keys.join("\n")}</div></div><button class="btn primary" data-act="copyNew">Copy</button></div>`;confetti()}),
+  copyNew:()=>copyText((S.newKeys||[]).join("\n")),
+  copyKey:el=>copyText(el.dataset.k),
+  editLic:el=>{const l=S.ov.licenses.find(x=>x.key===el.dataset.k);if(!l)return;
+    modal(`<h2 style="margin-bottom:16px">Edit license</h2><div class="key muted" style="margin-bottom:14px">${esc(l.key)}</div><div class="grid">
+    <label class="field"><span>User name</span><input id="ef_name" value="${esc(l.name)}" maxlength="60"></label>
+    <label class="field"><span>Profile icon URL</span><input id="ef_img" value="${esc(l.avatar_url)}"></label>
+    <label class="field"><span>Data account</span><select id="ef_demo"><option value="">— None (own Meta account) —</option>${S.ov.demos.map(x=>`<option value="${x.id}" ${x.id===l.demo?"selected":""}>${esc(x.name)}</option>`).join("")}</select></label>
+    <label class="field"><span>Note</span><input id="ef_note" value="${esc(l.note)}" maxlength="60"></label></div>
+    <div class="row" style="margin-top:18px;justify-content:flex-end"><button class="btn" data-act="closeModal">Cancel</button><button class="btn primary" data-act="saveLic" data-k="${l.key}" data-busy="Saving…">Save</button></div>`)},
+  saveLic:el=>guard(el,async()=>{await api(`/admin/api/licenses/${el.dataset.k}/update`,"POST",{name:$("#ef_name").value,avatar_url:$("#ef_img").value,demo_account:$("#ef_demo").value,note:$("#ef_note").value});closeModal();toast("License updated");await loadOverview();viewLicenses()}),
+  closeModal:()=>closeModal(),
+  extend:el=>{modal(`<h2 style="margin-bottom:16px">Extend validity</h2><label class="field"><span>New valid-until date</span><input id="ex_date" type="date" value="${addDays(todayIST(),30)}" min="${todayIST()}"></label><div class="row" style="margin-top:18px;justify-content:flex-end"><button class="btn" data-act="closeModal">Cancel</button><button class="btn primary" data-act="doExtend" data-k="${el.dataset.k}">Extend</button></div>`)},
+  doExtend:el=>guard(el,async()=>{await api(`/admin/api/licenses/${el.dataset.k}/extend`,"POST",{valid_until:$("#ex_date").value});closeModal();toast("Validity extended");await loadOverview();viewLicenses()}),
+  resetDev:el=>{if(confirm("Unbind this key from its device?"))guard(el,async()=>{await api(`/admin/api/licenses/${el.dataset.k}/reset-device`,"POST",{});toast("Device reset");await loadOverview();viewLicenses()})},
+  revoke:el=>guard(el,async()=>{await api(`/admin/api/licenses/${el.dataset.k}/revoke`,"POST",{revoked:el.dataset.r==="1"});await loadOverview();viewLicenses()}),
+  delLic:el=>{if(confirm("Delete this license permanently?"))guard(el,async()=>{await api(`/admin/api/licenses/${el.dataset.k}`,"DELETE");toast("Deleted");await loadOverview();viewLicenses()})},
+  /* demo accounts */
+  newDemo:()=>{modal(`<h2 style="margin-bottom:16px">New data account</h2><div class="grid"><label class="field"><span>Name <small>(only you see this)</small></span><input id="nd_name" placeholder="e.g. Cricket channel" maxlength="80"></label>
+    <label class="field"><span>Currency</span><select id="nd_cur">${["INR","USD","EUR","GBP","AED"].map(c=>`<option>${c}</option>`).join("")}</select></label>
+    <div class="row"><span class="switch"><input type="checkbox" id="nd_sample" checked><i></i></span><div><b>Include sample campaign and numbers</b><div class="muted small">A ready-made campaign with 45 days of data</div></div></div></div>
+    <div class="row" style="margin-top:18px;justify-content:flex-end"><button class="btn" data-act="closeModal">Cancel</button><button class="btn primary" data-act="mkDemo" data-busy="Creating…">Create</button></div>`)},
+  mkDemo:el=>guard(el,async()=>{const r=await api("/admin/api/demo","POST",{name:$("#nd_name").value.trim()||"New account",currency:$("#nd_cur").value,sample:$("#nd_sample").checked});closeModal();toast("Account created ✨");await openAcct(r.id)}),
+  openAcct:el=>guard(null,()=>openAcct(el.dataset.id)),
+  delAcct:el=>{if(confirm("Delete this data account and all its numbers?"))guard(el,async()=>{await api("/admin/api/demo/"+el.dataset.id,"DELETE");toast("Deleted");await loadDemos();viewDemoList()})},
+  back:()=>{if(S.dirty&&!confirm("You have unsaved changes. Leave without saving?"))return;S.dirty=false;$("#savebar").classList.remove("show");S.acct=null;render()},
+  sub:el=>{S.sub=el.dataset.s;viewSub()},
+  addRec:()=>{S.acct.doc.recommendations.push({type:"New recommendation",body:"",lift:"",points:2});markDirty();subAccount()},
+  delRec:el=>{S.acct.doc.recommendations.splice(+el.dataset.i,1);markDirty();subAccount()},
+  campStatus:el=>{S.acct.doc.campaigns[+el.dataset.i].status=el.checked?"ACTIVE":"PAUSED";markDirty();subCampaigns()},
+  newCamp:()=>openWizard(-1),
+  editCamp:el=>openWizard(+el.dataset.i),
+  dayFor:el=>{S.day.ci=+el.dataset.i;S.sub="daily";loadDay();viewSub()},
+  dupCamp:el=>{const c=clone(S.acct.doc.campaigns[+el.dataset.i]);stripIds(c);c.name+=" (copy)";S.acct.doc.campaigns.push(c);markDirty();subCampaigns();toast("Duplicated — save to keep it")},
+  delCamp:el=>{if(confirm("Delete this campaign and its numbers?")){S.acct.doc.campaigns.splice(+el.dataset.i,1);markDirty();subCampaigns()}},
+  /* daily */
+  dayQuick:el=>{S.day.date=addDays(todayIST(),+el.dataset.n);loadDay();subDaily()},
+  pickDay:el=>{S.day.date=el.dataset.d;loadDay();subDaily();scrollTo({top:0,behavior:"smooth"})},
+  saveDay:()=>{const c=S.acct.doc.campaigns[S.day.ci];c.daily[S.day.date]={...S.dayRow};markDirty();subDaily();toast("Day updated — press Save changes to send it to the app")},
+  delDay:()=>{const c=S.acct.doc.campaigns[S.day.ci];delete c.daily[S.day.date];loadDay();markDirty();subDaily()},
+  randDay:()=>{const a=S.acct.doc.campaigns[S.day.ci].adsets[0],base=(a&&a.daily_budget)||1000,r=Math.random,spend=Math.round(base*(.6+r()*.8)*100)/100,imp=Math.round(spend*(9+r()*6)),clicks=Math.round(imp*(.012+r()*.01));
+    S.dayRow={spend,reach:Math.round(imp*(.72+r()*.12)),impressions:imp,clicks,unique_clicks:Math.round(clicks*.8),results:Math.round(clicks*(.4+r()*.3))};subDaily()},
+  genDaily:el=>guard(el,async()=>{const r=await api("/admin/api/demo-generate","POST",{...S.gen});const c=S.acct.doc.campaigns[S.day.ci];Object.assign(c.daily,r.daily);loadDay();markDirty();subDaily();toast("Generated "+Object.keys(r.daily).length+" days")}),
+  clearAllDays:()=>{if(confirm("Remove every daily number of this campaign?")){S.acct.doc.campaigns[S.day.ci].daily={};loadDay();markDirty();subDaily()}},
+  /* wizard */
+  wizClose:()=>{if(confirm("Close without saving this campaign?")){closeModal();W=null}},
+  wizBack:()=>{if(W.step>0){W.step--;wizRender()}},
+  wizNext:()=>{const e=wizCheck();if(e)return toast(e,"bad");W.step++;wizRender()},
+  wizFinish:el=>guard(el,async()=>{
+    const c=W.camp,a=c.adsets[0],ad=c.ads[0];a.name=(a.name||"").trim()||c.name;ad.name=(ad.name||"").trim()||c.name+" ad";c.name=c.name.trim();if(W.mode==="new"){delete ad.adset_id;c.created=todayIST()}
+    if(W.gen.mode==="gen"){const r=await api("/admin/api/demo-generate","POST",{...W.gen});c.daily=W.mode==="new"?r.daily:Object.assign({},c.daily,r.daily)}
+    const mode=W.mode;if(mode==="new")S.acct.doc.campaigns.push(c);else S.acct.doc.campaigns[W.idx]=c;
+    await saveDoc();closeModal();W=null;S.sub="campaigns";viewEditor();confetti();toast(mode==="new"?"Campaign created 🎉":"Campaign saved ✓")}),
+  obj:el=>{W.camp.objective=el.dataset.v;W.camp.result_action=RESULT_BY_OBJ[el.dataset.v];wizRender()},
+  wstatus:el=>{W.camp.status=el.dataset.v;wizRender()},
+  wastatus:el=>{W.camp.adsets[0].status=el.dataset.v;wizRender()},
+  wgender:el=>{W.camp.adsets[0].genders=+el.dataset.v;wizRender()},
+  tog:el=>{const arr=getp(el.dataset.p),v=el.dataset.v,i=arr.indexOf(v);i<0?arr.push(v):arr.splice(i,1);wizRender()},
+  tagDel:el=>{getp(el.dataset.p).splice(+el.dataset.i,1);wizRender()},
+  addInterest:el=>{const a=W.camp.adsets[0].interests;if(!a.includes(el.dataset.v))a.push(el.dataset.v);wizRender()},
+  autoPl:el=>{W.camp.adsets[0].placements.auto=el.checked;wizRender()},
+  sampleVideo:()=>{W.camp.ads[0].video_url=S.sample;wizRender()},
+  genMode:el=>{W.gen.mode=el.dataset.v;wizRender()},
+  /* app control */
+  saveMaint:el=>guard(el,async()=>{await api("/admin/api/maintenance","POST",{enabled:$("#m_on").checked,message:$("#m_msg").value});toast($("#m_on").checked?"Maintenance is ON":"Maintenance is OFF");await loadOverview()}),
+  unblockAll:el=>guard(el,async()=>{const r=await api("/admin/api/unblock-all","POST",{});toast(r.unblocked+" device(s) unblocked")}),
+};
+const CHG={
+  dayCamp:el=>{S.day.ci=+el.value;loadDay();subDaily()},
+  dayDate:el=>{if(!el.value)return;S.day.date=el.value;loadDay();subDaily()},
+};
+document.addEventListener("click",e=>{const el=e.target.closest("[data-act]");if(!el)return;const f=ACT[el.dataset.act];if(f)f(el,e)});
+document.addEventListener("change",e=>{const el=e.target.closest("[data-chg]");if(el&&CHG[el.dataset.chg])CHG[el.dataset.chg](el)});
+document.addEventListener("keydown",e=>{
+  const t=e.target.closest&&e.target.closest("[data-tagin]");if(!t)return;const path=t.dataset.tagin;
+  const refocus=()=>{wizRender();const n=$(`[data-tagin="${path}"]`);n&&n.focus()};
+  if(e.key==="Enter"||e.key===","){e.preventDefault();let v=t.value.trim().replace(/,$/,"");if(!v)return;if(t.dataset.up){v=v.toUpperCase();if(v.length!==2)return toast("Use a 2-letter country code like IN","bad")}const arr=getp(path);if(!arr.includes(v))arr.push(v);refocus()}
+  else if(e.key==="Backspace"&&!t.value){const arr=getp(path);if(arr.length){arr.pop();refocus()}}
+});
+(async function boot(){
+  try{S.session=await (await fetch("/admin/api/session",{credentials:"same-origin"})).json()}catch(e){S.session={configured:true}}
+  if(S.session.authed)await enter();else showLogin();
+})();
+</script>
+</body>
+</html>
