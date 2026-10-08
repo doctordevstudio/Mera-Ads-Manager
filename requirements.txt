@@ -1,4 +1,0 @@
-flask>=3.0,<4
-gunicorn>=22.0
-requests>=2.32
-cryptography>=43.0
