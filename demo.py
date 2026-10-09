@@ -152,6 +152,7 @@ def _ad(a, ids, adset_ids):
         "link_url": _url(a.get("link_url")),
         "link_display": _str(a.get("link_display"), 120),
         "cta": _str(a.get("cta"), 30) or "LEARN_MORE",
+        "see_more_limit": _int(a.get("see_more_limit"), 230, 0, 5000) if a.get("see_more_limit") not in (None, "") else 230,
         "video_url": _url(a.get("video_url")),
         "thumb_url": _url(a.get("thumb_url")),
         "reactions": {k: _int(r.get(k), 0) for k in ("like", "love", "haha")},
@@ -397,6 +398,7 @@ def ad_content(ad: dict, ctx: dict) -> dict:
         "link_url": link, "link_display": disp, "cta": ad.get("cta", "LEARN_MORE"),
         "video_url": ad.get("video_url", ""), "thumb_url": ad.get("thumb_url", ""),
         "reactions": ad.get("reactions", {}), "comments": ad.get("comments", 0), "shares": ad.get("shares", 0),
+        "see_more_limit": ad.get("see_more_limit", 230),
     }
 
 
