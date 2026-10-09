@@ -88,7 +88,7 @@ select option{background:#0d1236}
 .warn{background:rgba(255,184,77,.1);border:1px solid rgba(255,184,77,.35);color:var(--amber);padding:12px 14px;border-radius:12px;font-size:13.5px;margin-bottom:14px}
 
 /* shell */
-#app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+#app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
 aside{position:sticky;top:0;height:100vh;padding:22px 16px;display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line);background:rgba(7,10,31,.5);backdrop-filter:blur(20px)}
 .brand{display:flex;align-items:center;gap:12px;padding:6px 8px 20px}.brand .logo{width:42px;height:42px;font-size:22px;margin:0;border-radius:14px;animation:none}
 .brand b{display:block;font-size:16px}.brand span{font-size:12px;color:var(--muted)}
@@ -96,11 +96,11 @@ aside{position:sticky;top:0;height:100vh;padding:22px 16px;display:flex;flex-dir
 .nav:hover{background:var(--card);color:var(--text);transform:translateX(3px)}
 .nav.on{background:linear-gradient(90deg,rgba(124,92,255,.28),rgba(34,211,238,.12));color:#fff;border-color:rgba(124,92,255,.4)}
 .nav .ic{font-size:18px;width:22px;text-align:center}
-main{padding:28px clamp(16px,3vw,40px) 120px;max-width:1280px;width:100%}
+main{padding:28px clamp(16px,3vw,40px) 120px;max-width:1280px;width:100%;min-width:0}
 .view{animation:up .5s var(--ease) both}
 .top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
 @media(max-width:820px){
-  #app{grid-template-columns:1fr}
+  #app{grid-template-columns:minmax(0,1fr)}
   aside{position:fixed;inset:auto 0 0 0;height:auto;flex-direction:row;justify-content:space-around;padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:40;border-right:0;border-top:1px solid var(--line)}
   .brand,.sidefoot{display:none}.nav{flex-direction:column;gap:2px;padding:8px 10px;font-size:11px}.nav:hover{transform:none}
   main{padding-bottom:130px}
@@ -140,11 +140,16 @@ tr.hov{transition:background .2s}tr.hov:hover{background:rgba(255,255,255,.04)}
 @media(max-width:820px){.savebar{bottom:88px}}
 
 /* modal + wizard */
-.overlay{position:fixed;inset:0;z-index:70;background:rgba(3,5,20,.7);backdrop-filter:blur(8px);display:grid;place-items:center;padding:14px;animation:pop .3s var(--ease) both;overflow-y:auto}
+.overlay{position:fixed;inset:0;z-index:70;background:rgba(3,5,20,.7);backdrop-filter:blur(8px);display:grid;grid-template-columns:minmax(0,1fr);place-items:center;padding:14px;animation:pop .3s var(--ease) both;overflow-y:auto}
+.modal,.wiz{min-width:0}
+.grid>*,.split>*{min-width:0}
 .modal{width:100%;max-width:560px;padding:24px;max-height:94vh;overflow-y:auto}
-.wiz{max-width:1020px;padding:0;display:flex;flex-direction:column;overflow:hidden;height:min(94vh,900px)}
+.wiz{max-width:1020px;padding:0;display:flex;flex-direction:column;overflow:hidden;height:min(94vh,900px);height:min(94dvh,900px)}
+#wizRoot,#edRoot{display:flex;flex-direction:column;flex:1;min-height:0;min-width:0}
+.wiz-head,.wiz-foot{flex:none}
+@media(max-width:600px){.overlay{padding:8px}.wiz{height:calc(100vh - 16px);height:calc(100dvh - 16px)}.wiz-body{padding:16px}.wiz-head,.wiz-foot{padding-left:16px;padding-right:16px}}
 .wiz-head{padding:20px 24px 14px;border-bottom:1px solid var(--line)}
-.wiz-body{padding:22px 24px;overflow-y:auto;flex:1;min-height:0;animation:up .45s var(--ease) both}
+.wiz-body{padding:22px 24px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;flex:1;min-height:0;animation:up .45s var(--ease) both}
 .wiz-foot{padding:14px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:space-between;align-items:center}
 .steps{display:flex;gap:6px;margin:12px 0 8px}.steps i{flex:1;height:6px;border-radius:9px;background:rgba(255,255,255,.12);transition:.4s}.steps i.done{background:var(--g1)}.steps i.now{background:var(--g2)}
 .opt{padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--card);cursor:pointer;transition:all .25s var(--ease)}
@@ -156,7 +161,7 @@ tr.hov{transition:background .2s}tr.hov:hover{background:rgba(255,255,255,.04)}
 /* facebook-like preview */
 .fb{background:#fff;color:#1c1e21;border-radius:14px;overflow:hidden;font:14px/1.4 system-ui,sans-serif;box-shadow:0 20px 50px rgba(0,0,0,.5)}
 .fb .h{display:flex;gap:10px;padding:12px;align-items:center}.fb .av{width:40px;height:40px;border-radius:50%;background:#ddd;overflow:hidden;display:grid;place-items:center;font-weight:700;color:#555}.fb .av img{width:100%;height:100%;object-fit:cover}
-.fb .t{padding:0 12px 10px;white-space:pre-wrap;word-break:break-word}.fb video,.fb .vid{width:100%;aspect-ratio:4/5;background:#111;object-fit:cover;display:block}
+.fb .t{padding:0 12px 10px;white-space:pre-wrap;word-break:break-word}.fb .vw{padding:0 26px}.fb video,.fb .vid{width:100%;aspect-ratio:9/16;background:#000;object-fit:contain;display:block}
 .fb .lk{display:flex;gap:10px;align-items:center;background:#f0f2f5;padding:10px 12px}.fb .lk b{display:block}.fb .lk .b{margin-left:auto;background:#e4e6eb;border-radius:6px;padding:7px 12px;font-weight:700;font-size:13px}
 .fb .rx{display:flex;justify-content:space-between;padding:8px 12px;color:#65676b;font-size:13px}.fb .ab{display:flex;border-top:1px solid #e4e6eb}.fb .ab div{flex:1;text-align:center;padding:10px 4px;font-weight:600;color:#65676b;white-space:nowrap;font-size:13px}
 #toasts{position:fixed;right:16px;top:16px;z-index:200;display:grid;gap:10px}
@@ -209,8 +214,10 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:300}
 "use strict";
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const S={session:{},ov:null,tab:"overview",demos:[],acct:null,sub:"account",dirty:false,dayRow:null,day:{ci:0,date:""},gen:null,sample:""};
+const S={session:{},ov:null,tab:"overview",demos:[],acct:null,sub:"account",dirty:false,dayRow:null,day:{ci:0,date:""},gen:null,sample:"",open:{},edit:null,editKind:null,editCi:0,editIdx:-1};
 let W=null;
+let REFRESH=()=>{};
+let PVSRC=()=>W&&W.camp.ads[0];
 const CUR={INR:"₹",USD:"$",EUR:"€",GBP:"£",AED:"AED ",JPY:"¥",BDT:"৳",PKR:"Rs "};
 const money=(n,c="INR")=>(CUR[c]||c+" ")+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
 const num=n=>Number(n||0).toLocaleString("en-IN");
@@ -252,8 +259,8 @@ function countUps(){$$("[data-count]").forEach(el=>{const to=+el.dataset.count,t
 function animateBars(){requestAnimationFrame(()=>$$("[data-w]").forEach(b=>b.style.width=b.dataset.w+"%"))}
 
 /* ---------- data binding ---------- */
-function resolve(path){const ks=path.split(".");let o=ks[0]==="W"?W:ks[0]==="D"?S.dayRow:ks[0]==="G"?S.gen:S.acct;for(let i=1;i<ks.length-1;i++)o=o[ks[i]];return[o,ks[ks.length-1]]}
-const getp=p=>{const[o,k]=resolve(p);return o[k]};
+function resolve(path){const ks=path.split(".");let o=ks[0]==="W"?W:ks[0]==="D"?S.dayRow:ks[0]==="G"?S.gen:ks[0]==="E"?S.edit:S.acct;for(let i=1;i<ks.length-1;i++)o=o[ks[i]];return[o,ks[ks.length-1]]}
+const getp=p=>{if(p==="E")return S.edit;const[o,k]=resolve(p);return o[k]};
 const setp=(p,v)=>{const[o,k]=resolve(p);o[k]=v};
 function markDirty(){S.dirty=true;$("#savebar").classList.add("show")}
 function onBind(e){
@@ -269,7 +276,7 @@ document.addEventListener("input",onBind);document.addEventListener("change",onB
 let pvT;function live(p){
   if(p.startsWith("acct.doc.opportunity_score")){const s=getp("acct.doc.opportunity_score");$("#ringBox")&&($("#ringBox").innerHTML=ringSVG(s));$("#scoreOut")&&($("#scoreOut").textContent=s)}
   if(p.startsWith("acct.doc.spend_cap"))updateSpend();
-  if(p.startsWith("W.camp.ads")||p.startsWith("W.camp.name")){clearTimeout(pvT);pvT=setTimeout(refreshPreview,350)}
+  if(p.startsWith("W.camp.ads")||p.startsWith("W.camp.name")||(S.editKind==="ad"&&p.startsWith("E."))){clearTimeout(pvT);pvT=setTimeout(refreshPreview,350)}
 }
 function lifetime(doc){return doc.campaigns.reduce((a,c)=>a+Object.values(c.daily||{}).reduce((s,r)=>s+(+r.spend||0),0),0)}
 function updateSpend(){const d=S.acct.doc,sp=lifetime(d),cap=+d.spend_cap||0,pct=cap>0?Math.min(100,sp/cap*100):0;const b=$("#spendBar");if(b){b.style.width=pct+"%";b.parentElement.classList.toggle("hot",pct>=80)}const o=$("#spendTxt");if(o)o.textContent=cap>0?`${money(sp,d.currency)} of ${money(cap,d.currency)} (${pct.toFixed(0)}%)`:`${money(sp,d.currency)} spent · no limit set`}
@@ -392,10 +399,30 @@ function sumRange(c,a,b){const t={spend:0,reach:0,impressions:0,clicks:0,unique_
 function subCampaigns(){
   const d=S.acct.doc;
   $("#sub").innerHTML=`<div class="row" style="margin-bottom:14px"><button class="btn warm" data-act="newCamp">➕ New campaign (step by step)</button><span class="muted small">${d.campaigns.length} campaign${d.campaigns.length==1?"":"s"}</span></div><div class="grid">
-  ${d.campaigns.map((c,i)=>{const t=campTotals(c),o=OBJ[c.objective]||["📣","",""];return`<div class="glass camp up" style="--i:${i}"><div class="row" style="justify-content:space-between"><div class="row" style="flex-wrap:nowrap"><div class="avatar" style="background:var(--g1);font-size:20px">${o[0]}</div><div><b>${esc(c.name)}</b><div class="muted small">${o[1]} · ${c.adsets.length} ad set · ${c.ads.length} ad</div></div></div><div class="row" style="gap:8px"><span class="small muted">${c.status==="ACTIVE"?"Active":c.status==="PAUSED"?"Paused":"Archived"}</span><span class="switch"><input type="checkbox" ${c.status==="ACTIVE"?"checked":""} data-act="campStatus" data-i="${i}"><i></i></span></div></div>
+  ${d.campaigns.map((c,i)=>{const t=campTotals(c),o=OBJ[c.objective]||["📣","",""],open=S.open[i];return`<div class="glass camp up" style="--i:${i}"><div class="row" style="justify-content:space-between"><div class="row" style="flex-wrap:nowrap"><div class="avatar" style="background:var(--g1);font-size:20px">${o[0]}</div><div><b>${esc(c.name)}</b><div class="muted small">${o[1]} · ${c.adsets.length} ad set · ${c.ads.length} ad</div></div></div><div class="row" style="gap:8px"><span class="small muted">${c.status==="ACTIVE"?"Active":c.status==="PAUSED"?"Paused":"Archived"}</span><span class="switch"><input type="checkbox" ${c.status==="ACTIVE"?"checked":""} data-act="campStatus" data-i="${i}"><i></i></span></div></div>
   <div class="grid g6 keep2">${[["Spent",money(t.spend,d.currency)],[RESULTS[c.result_action]||"Results",num(t.results)],["Reach",num(t.reach)],["Impressions",num(t.impressions)],["Clicks",num(t.clicks)],["Unique clicks",num(t.unique_clicks)]].map(m=>`<div class="metric"><b>${m[1]}</b><span>${esc(m[0])}</span></div>`).join("")}</div>
-  <div class="actions"><button class="btn sm primary" data-act="editCamp" data-i="${i}">✏️ Edit everything</button><button class="btn sm" data-act="dayFor" data-i="${i}">📅 Daily numbers</button><button class="btn sm" data-act="dupCamp" data-i="${i}">Duplicate</button><button class="btn sm danger" data-act="delCamp" data-i="${i}">Delete</button></div></div>`}).join("")||'<div class="glass pad muted" style="text-align:center">No campaigns yet. Create the first one 👆</div>'}</div>`;
+  <div class="actions"><button class="btn sm primary" data-act="editCamp" data-i="${i}">✏️ Edit everything</button><button class="btn sm" data-act="toggleDetail" data-i="${i}">${open?"▾":"▸"} Ad sets &amp; ads (${c.adsets.length}/${c.ads.length})</button><button class="btn sm" data-act="dayFor" data-i="${i}">📅 Daily numbers</button><button class="btn sm" data-act="dupCamp" data-i="${i}">Duplicate</button><button class="btn sm danger" data-act="delCamp" data-i="${i}">Delete</button></div>
+  ${open?`<div class="grid" style="gap:10px"><div class="small muted" style="font-weight:700">AD SETS — the “Ad Set” card shown above the ad in the app</div>
+   ${c.adsets.map((a,k)=>`<div class="metric" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span class="switch"><input type="checkbox" ${a.status==="ACTIVE"?"checked":""} data-act="asStatus" data-i="${i}" data-k="${k}"><i></i></span><div class="grow" style="min-width:160px"><b style="display:block;font-size:14px">${esc(a.name)}</b><span>${money(a.daily_budget,d.currency)}/day · ${esc(a.start_time)} → ${esc(a.end_time||"ongoing")} · ${esc(a.countries.join(", "))}</span></div><button class="btn sm" data-act="editAdset" data-i="${i}" data-k="${k}">Edit</button><button class="btn sm danger" data-act="delAdset" data-i="${i}" data-k="${k}">Delete</button></div>`).join("")}
+   <div><button class="btn sm" data-act="newAdset" data-i="${i}">➕ Add ad set</button></div>
+   <div class="small muted" style="font-weight:700;margin-top:6px">ADS</div>
+   ${c.ads.map((a,k)=>`<div class="metric" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span class="switch"><input type="checkbox" ${a.status==="ACTIVE"?"checked":""} data-act="adStatus" data-i="${i}" data-k="${k}"><i></i></span><div class="grow" style="min-width:160px"><b style="display:block;font-size:14px">${esc(a.name)}</b><span>${esc((c.adsets.find(x=>x.id===a.adset_id)||c.adsets[0]||{}).name||"")} · ${num((+a.reactions.like||0)+(+a.reactions.love||0)+(+a.reactions.haha||0))} reactions · ${num(a.comments)} comments</span></div><button class="btn sm" data-act="editAd" data-i="${i}" data-k="${k}">Edit</button><button class="btn sm danger" data-act="delAd" data-i="${i}" data-k="${k}">Delete</button></div>`).join("")}
+   <div><button class="btn sm" data-act="newAd" data-i="${i}">➕ Add ad</button></div></div>`:""}</div>`}).join("")||'<div class="glass pad muted" style="text-align:center">No campaigns yet. Create the first one 👆</div>'}</div>`;
 }
+/* ---- ad set / ad editor ---- */
+function openEditor(kind,ci,idx){
+  const c=S.acct.doc.campaigns[ci];S.editKind=kind;S.editCi=ci;S.editIdx=idx;
+  if(kind==="adset"){S.edit=idx<0?clone(c.adsets[0]||newAdset("")):clone(c.adsets[idx]);if(idx<0){delete S.edit.id;S.edit.name=(c.adsets[0]?c.adsets[0].name:c.name)+" copy"}}
+  else{S.edit=idx<0?clone(c.ads[0]||newAd("")):clone(c.ads[idx]);if(idx<0){delete S.edit.id;S.edit.name="";S.edit.adset_id=c.adsets[0]?c.adsets[0].id:""}}
+  REFRESH=editRender;PVSRC=()=>S.edit;modal('<div id="edRoot"></div>',"wiz");editRender();
+}
+function editRender(){
+  const root=$("#edRoot");if(!root||!S.edit)return;const c=S.acct.doc.campaigns[S.editCi],isSet=S.editKind==="adset",neu=S.editIdx<0;
+  root.innerHTML=`<div class="wiz-head"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><div><h2>${neu?"Add":"Edit"} ${isSet?"ad set":"ad"}</h2><div class="muted small">${esc(c.name)}</div></div><button class="btn sm" data-act="closeEdit">✕</button></div></div>
+  <div class="wiz-body">${isSet?adsetBudgetHTML("E")+'<div style="height:18px"></div>'+adsetAudienceHTML("E"):`<div class="split">${adFieldsHTML("E",c.adsets)}<div><div class="small muted" style="font-weight:700;margin-bottom:8px">Live preview</div><div id="pvBox">${fbPreview(S.edit)}</div></div></div>`}</div>
+  <div class="wiz-foot"><button class="btn" data-act="closeEdit">Cancel</button><button class="btn primary" data-act="saveEdit" data-busy="Saving…">💾 Save ${isSet?"ad set":"ad"}</button></div>`;
+}
+function closeEditor(){closeModal();S.edit=null;S.editKind=null;REFRESH=()=>{}}
 function subDaily(){
   const d=S.acct.doc;
   if(!d.campaigns.length){$("#sub").innerHTML='<div class="glass pad muted" style="text-align:center">Create a campaign first, then add its daily numbers here.</div>';return}
@@ -423,13 +450,14 @@ function subDaily(){
 /* ---------- wizard ---------- */
 const STEPS=["Basics","Budget & schedule","Audience","Ad creative","Performance data","Review"];
 const newAdset=n=>({name:n||"",status:"ACTIVE",daily_budget:1000,bid_strategy:"LOWEST_COST_WITHOUT_CAP",start_time:todayIST(),end_time:"",countries:["IN"],age_min:18,age_max:65,genders:0,interests:[],placements:{auto:false,platforms:["facebook","instagram"],facebook:[],instagram:[]},expansion:false});
-const newAd=n=>({name:n||"",status:"ACTIVE",profile_name:"",profile_image:"",message:"",headline:"",link_url:"https://",link_display:"",cta:"LEARN_MORE",video_url:S.sample,thumb_url:"",reactions:{like:0,love:0,haha:0},comments:0,shares:0});
+const newAd=n=>({name:n||"",status:"ACTIVE",profile_name:"",profile_image:"",message:"",see_more_limit:230,headline:"",link_url:"https://",link_display:"",cta:"LEARN_MORE",video_url:S.sample,thumb_url:"",reactions:{like:0,love:0,haha:0},comments:0,shares:0});
 function openWizard(i){
   const d=S.acct.doc,t=todayIST();
   const camp=i<0?{name:"",objective:"OUTCOME_LEADS",status:"ACTIVE",result_action:"subscribe_website",daily_budget:null,adsets:[newAdset()],ads:[newAd()],daily:{}}:clone(d.campaigns[i]);
   if(!camp.adsets.length)camp.adsets.push(newAdset(camp.name));
   if(!camp.ads.length)camp.ads.push(newAd());
   W={mode:i<0?"new":"edit",idx:i,step:0,camp,gen:{mode:i<0?"gen":"keep",start:addDays(t,-29),end:t,spend:30000,reach:200000,impressions:280000,clicks:2200,unique_clicks:1700,results:1400}};
+  REFRESH=wizRender;PVSRC=()=>W&&W.camp.ads[0];S.editKind=null;
   modal('<div id="wizRoot"></div>',"wiz");wizRender();
 }
 const cs=()=>CUR[S.acct.doc.currency]||S.acct.doc.currency;
@@ -440,45 +468,51 @@ const chipsH=(path,map)=>{const a=getp(path)||[];return Object.entries(map).map(
 function st0(){const c=W.camp;return`<div class="grid">${FLD("Campaign name *","W.camp.name",{ph:"e.g. Diwali Subscribers Boost"})}
  <div><div class="small muted" style="font-weight:700;margin-bottom:8px">What is the goal?</div><div class="grid g3">${Object.entries(OBJ).map(([k,v])=>`<div class="opt ${c.objective===k?"on":""}" data-act="obj" data-v="${k}"><div style="font-size:26px">${v[0]}</div><b>${v[1]}</b><div class="muted small">${v[2]}</div></div>`).join("")}</div></div>
  <div class="grid g2"><label class="field"><span>Result the app counts</span><select data-b="W.camp.result_action">${Object.entries(RESULTS).map(([k,l])=>`<option value="${k}" ${c.result_action===k?"selected":""}>${l}</option>`).join("")}</select></label>
- <div class="field"><span>Status</span><div class="row">${[["ACTIVE","Active"],["PAUSED","Paused"]].map(s=>`<span class="chip ${c.status===s[0]?"on":""}" data-act="wstatus" data-v="${s[0]}">${s[1]}</span>`).join("")}</div></div></div>
+ <div class="field"><span>Status</span><div class="row">${[["ACTIVE","Active"],["PAUSED","Paused"]].map(s=>`<span class="chip ${c.status===s[0]?"on":""}" data-act="setv" data-p="W.camp.status" data-v="${s[0]}">${s[1]}</span>`).join("")}</div></div></div>
  ${FLD("Campaign-level daily budget <small>(optional)</small>","W.camp.daily_budget",{type:"number",t:"nn",ph:"Leave empty to set the budget on the ad set",x:'min="0" step="any"'})}</div>`}
-function st1(){const a="W.camp.adsets.0";return`<div class="grid g2">${FLD("Ad set name",a+".name",{ph:"Defaults to the campaign name"})}${FLD("Daily budget ("+cs()+") *",a+".daily_budget",{type:"number",t:"n",x:'min="0" step="any"'})}
- <label class="field"><span>Bid strategy</span><select data-b="${a}.bid_strategy">${Object.entries(BIDS).map(([k,l])=>`<option value="${k}" ${getp(a+".bid_strategy")===k?"selected":""}>${l}</option>`).join("")}</select></label>
- <div class="field"><span>Ad set status</span><div class="row">${[["ACTIVE","Active"],["PAUSED","Paused"]].map(s=>`<span class="chip ${getp(a+".status")===s[0]?"on":""}" data-act="wastatus" data-v="${s[0]}">${s[1]}</span>`).join("")}</div></div>
- ${FLD("Start date",a+".start_time",{type:"date"})}${FLD("End date <small>(optional)</small>",a+".end_time",{type:"date"})}</div>
- <p class="muted small" style="margin-top:14px">💡 A start date in the past lets you test history. Leave the end date empty for an ongoing campaign.</p>`}
-function st2(){const a="W.camp.adsets.0",ad=W.camp.adsets[0];return`<div class="grid">
- <div class="field"><span>Countries <small>(2-letter codes, press Enter)</small></span>${tagsH(a+".countries","IN, US, GB…",1)}</div>
- <div class="grid g3">${FLD("Min age",a+".age_min",{type:"number",t:"n",x:'min="13" max="65"'})}${FLD("Max age",a+".age_max",{type:"number",t:"n",x:'min="13" max="65"'})}
- <div class="field"><span>Gender</span><div class="row">${[[0,"All"],[1,"Men"],[2,"Women"]].map(g=>`<span class="chip ${ad.genders===g[0]?"on":""}" data-act="wgender" data-v="${g[0]}">${g[1]}</span>`).join("")}</div></div></div>
- <div class="field"><span>Interests <small>(type and press Enter, or tap a suggestion)</small></span>${tagsH(a+".interests","Cricket, Dancing…")}<div class="row" style="gap:8px;margin-top:6px">${INTERESTS.filter(x=>!ad.interests.includes(x)).slice(0,8).map(x=>`<span class="chip" data-act="addInterest" data-v="${esc(x)}">+ ${esc(x)}</span>`).join("")}</div></div>
- <div class="row"><label class="switch"><input type="checkbox" ${ad.expansion?"checked":""} data-b="${a}.expansion"><i></i></label><div><b>Detailed targeting expansion</b><div class="muted small">Shown in the app as "Detailed targeting expanded"</div></div></div>
- <div class="glass pad" style="background:rgba(255,255,255,.04)"><div class="row" style="margin-bottom:10px"><label class="switch"><input type="checkbox" ${ad.placements.auto?"checked":""} data-act="autoPl"><i></i></label><div><b>Automatic placements</b><div class="muted small">Turn off to choose where the ad runs</div></div></div>
- ${ad.placements.auto?"":`<div class="small muted" style="font-weight:700;margin:6px 0">Platforms</div><div class="row" style="gap:8px">${chipsH(a+".placements.platforms",{facebook:"Facebook",instagram:"Instagram",audience_network:"Audience Network",messenger:"Messenger"})}</div>
- <div class="small muted" style="font-weight:700;margin:12px 0 6px">Facebook placements</div><div class="row" style="gap:8px">${chipsH(a+".placements.facebook",FBPOS)}</div>
- <div class="small muted" style="font-weight:700;margin:12px 0 6px">Instagram placements</div><div class="row" style="gap:8px">${chipsH(a+".placements.instagram",IGPOS)}</div>`}</div></div>`}
-function fbPreview(){
-  const ad=W.camp.ads[0],nm=ad.profile_name||"Profile name",tot=(+ad.reactions.like||0)+(+ad.reactions.love||0)+(+ad.reactions.haha||0);
+function adsetBudgetHTML(P){const st=getp(P+".status");return`<div class="grid g2">${FLD("Ad set name",P+".name",{ph:"Defaults to the campaign name"})}${FLD("Daily budget ("+cs()+") *",P+".daily_budget",{type:"number",t:"n",x:'min="0" step="any"'})}
+ <label class="field"><span>Bid strategy</span><select data-b="${P}.bid_strategy">${Object.entries(BIDS).map(([k,l])=>`<option value="${k}" ${getp(P+".bid_strategy")===k?"selected":""}>${l}</option>`).join("")}</select></label>
+ <div class="field"><span>Ad set status <small>(on / off in the app)</small></span><div class="row">${[["ACTIVE","On"],["PAUSED","Off"]].map(x=>`<span class="chip ${st===x[0]?"on":""}" data-act="setv" data-p="${P}.status" data-v="${x[0]}">${x[1]}</span>`).join("")}</div></div>
+ ${FLD("Start date",P+".start_time",{type:"date"})}${FLD("End date <small>(optional)</small>",P+".end_time",{type:"date"})}</div>
+ <p class="muted small" style="margin-top:14px">💡 A start date in the past lets you test history. Leave the end date empty for an ongoing ad set.</p>`}
+function adsetAudienceHTML(P){const ad=getp(P);return`<div class="grid">
+ <div class="field"><span>Countries <small>(2-letter codes, press Enter)</small></span>${tagsH(P+".countries","IN, US, GB…",1)}</div>
+ <div class="grid g3">${FLD("Min age",P+".age_min",{type:"number",t:"n",x:'min="13" max="65"'})}${FLD("Max age",P+".age_max",{type:"number",t:"n",x:'min="13" max="65"'})}
+ <div class="field"><span>Gender</span><div class="row">${[[0,"All"],[1,"Men"],[2,"Women"]].map(g=>`<span class="chip ${ad.genders===g[0]?"on":""}" data-act="setv" data-p="${P}.genders" data-v="${g[0]}">${g[1]}</span>`).join("")}</div></div></div>
+ <div class="field"><span>Interests <small>(type and press Enter, or tap a suggestion)</small></span>${tagsH(P+".interests","Cricket, Dancing…")}<div class="row" style="gap:8px;margin-top:6px">${INTERESTS.filter(x=>!ad.interests.includes(x)).slice(0,8).map(x=>`<span class="chip" data-act="addInterest" data-p="${P}.interests" data-v="${esc(x)}">+ ${esc(x)}</span>`).join("")}</div></div>
+ <div class="row"><label class="switch"><input type="checkbox" ${ad.expansion?"checked":""} data-b="${P}.expansion"><i></i></label><div><b>Detailed targeting expansion</b><div class="muted small">Shown in the app as "Detailed targeting expanded"</div></div></div>
+ <div class="glass pad" style="background:rgba(255,255,255,.04)"><div class="row" style="margin-bottom:10px"><label class="switch"><input type="checkbox" ${ad.placements.auto?"checked":""} data-act="autoPl" data-p="${P}.placements.auto"><i></i></label><div><b>Automatic placements</b><div class="muted small">Turn off to choose where the ad runs</div></div></div>
+ ${ad.placements.auto?"":`<div class="small muted" style="font-weight:700;margin:6px 0">Platforms</div><div class="row" style="gap:8px">${chipsH(P+".placements.platforms",{facebook:"Facebook",instagram:"Instagram",audience_network:"Audience Network",messenger:"Messenger"})}</div>
+ <div class="small muted" style="font-weight:700;margin:12px 0 6px">Facebook placements</div><div class="row" style="gap:8px">${chipsH(P+".placements.facebook",FBPOS)}</div>
+ <div class="small muted" style="font-weight:700;margin:12px 0 6px">Instagram placements</div><div class="row" style="gap:8px">${chipsH(P+".placements.instagram",IGPOS)}</div>`}</div></div>`}
+function st1(){return adsetBudgetHTML("W.camp.adsets.0")}
+function st2(){return adsetAudienceHTML("W.camp.adsets.0")}
+function fbPreview(ad){
+  const nm=ad.profile_name||"Profile name",tot=(+ad.reactions.like||0)+(+ad.reactions.love||0)+(+ad.reactions.haha||0);
+  const lim=+ad.see_more_limit||0,msg=ad.message||"Your message appears here…",cut=lim>0&&msg.length>lim;
   return`<div class="fb" id="fbPrev"><div class="h"><div class="av">${ad.profile_image?`<img src="${esc(ad.profile_image)}" alt="" onerror="this.remove()">`:esc(initial(nm))}</div><div><b>${esc(nm)}</b><div style="color:#65676b;font-size:12px">Sponsored · 🌐</div></div></div>
-  <div class="t">${esc(ad.message||"Your message appears here…")}</div>${ad.video_url?`<video muted playsinline preload="metadata" src="${esc(ad.video_url)}#t=1"></video>`:'<div class="vid"></div>'}
+  <div class="t">${esc(cut?msg.slice(0,lim).trimEnd():msg)}${cut?'...<span style="color:#1d5fd0">See more</span>':""}</div><div class="vw">${ad.video_url?`<video muted playsinline preload="metadata" src="${esc(ad.video_url)}#t=1"></video>`:'<div class="vid"></div>'}</div>
   <div class="lk"><div><small style="color:#65676b">${esc(ad.link_display||host(ad.link_url))}</small><b>${esc(ad.headline||"Headline")}</b></div><div class="b">${esc(CTAS[ad.cta]||"Learn more")}</div></div>
   <div class="rx"><span>👍❤️😆 ${num(tot)}</span><span>${num(ad.comments)} comments · ${num(ad.shares)} shares</span></div><div class="ab"><div>👍 Like</div><div>💬 Comment</div><div>↗ Share</div></div></div>`;
 }
 function refreshPreview(){
-  const old=$("#fbPrev");if(!old||!W)return;const ov=old.querySelector("video"),tmp=document.createElement("div");tmp.innerHTML=fbPreview();const nw=tmp.firstElementChild,nv=nw.querySelector("video");
+  const old=$("#fbPrev"),src=PVSRC();if(!old||!src)return;const ov=old.querySelector("video"),tmp=document.createElement("div");tmp.innerHTML=fbPreview(src);const nw=tmp.firstElementChild,nv=nw.querySelector("video");
   if(ov&&nv&&ov.getAttribute("src")===nv.getAttribute("src"))nv.replaceWith(ov);old.replaceWith(nw);
 }
-function st3(){const a="W.camp.ads.0";return`<div class="split"><div class="grid">
+function adFieldsHTML(a,adsets){const st=getp(a+".status");return`<div class="grid">
  <div class="grid g2">${FLD("Ad name",a+".name",{ph:"Defaults to the campaign name"})}<label class="field"><span>Button</span><select data-b="${a}.cta">${Object.entries(CTAS).map(([k,l])=>`<option value="${k}" ${getp(a+".cta")===k?"selected":""}>${l}</option>`).join("")}</select></label></div>
+ <div class="grid g2"><div class="field"><span>Ad status <small>(on / off in the app)</small></span><div class="row">${[["ACTIVE","On"],["PAUSED","Off"]].map(x=>`<span class="chip ${st===x[0]?"on":""}" data-act="setv" data-p="${a}.status" data-v="${x[0]}">${x[1]}</span>`).join("")}</div></div>
+ ${adsets&&adsets.length>1?`<label class="field"><span>Belongs to ad set</span><select data-b="${a}.adset_id">${adsets.map(x=>`<option value="${x.id||""}" ${getp(a+".adset_id")===x.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select></label>`:""}</div>
  <div class="glass pad" style="background:rgba(255,255,255,.04)"><div class="small muted" style="font-weight:700;margin-bottom:10px">Who posts the ad <small>(leave empty to use each user's name and photo from their license)</small></div><div class="grid g2">${FLD("Profile name",a+".profile_name",{ph:"Auto from license"})}${FLD("Profile icon URL",a+".profile_image",{ph:"Auto from license"})}</div></div>
  <label class="field"><span>Message</span><textarea data-b="${a}.message" placeholder="Write the text people see above the video">${fv(a+".message")}</textarea></label>
+ ${FLD("Show “…See more” after how many characters? <small>(0 = never cut the text)</small>",a+".see_more_limit",{type:"number",t:"n",x:'min="0" max="5000"'})}
  <div class="grid g2">${FLD("Headline",a+".headline",{ph:"JOIN NOW"})}${FLD("Website link",a+".link_url",{type:"url"})}</div>
  ${FLD("Display link <small>(shown under the video, auto if empty)</small>",a+".link_display",{ph:"example.com"})}
- <div class="field"><span>Video URL <small>(https link to an mp4 — the app plays it)</small></span><div class="row" style="flex-wrap:nowrap"><input data-b="${a}.video_url" value="${fv(a+".video_url")}" placeholder="https://…/video.mp4"><button class="btn sm" data-act="sampleVideo">Use sample</button></div></div>
+ <div class="field"><span>Video URL <small>(https link to an mp4 — the app plays it)</small></span><div class="row" style="flex-wrap:nowrap"><input data-b="${a}.video_url" value="${fv(a+".video_url")}" placeholder="https://…/video.mp4"><button class="btn sm" data-act="sampleVideo" data-p="${a}.video_url">Use sample</button></div></div>
  ${FLD("Thumbnail URL <small>(optional — the app uses the video's 1-second frame)</small>",a+".thumb_url",{ph:"https://…/thumb.jpg"})}
  <div class="small muted" style="font-weight:700">Engagement shown under the video</div>
- <div class="grid g3 keep2">${FLD("👍 Likes",a+".reactions.like",{type:"number",t:"n",x:'min="0"'})}${FLD("❤️ Love",a+".reactions.love",{type:"number",t:"n",x:'min="0"'})}${FLD("😆 Haha",a+".reactions.haha",{type:"number",t:"n",x:'min="0"'})}${FLD("💬 Comments",a+".comments",{type:"number",t:"n",x:'min="0"'})}${FLD("↗ Shares",a+".shares",{type:"number",t:"n",x:'min="0"'})}</div></div>
- <div><div class="small muted" style="font-weight:700;margin-bottom:8px">Live preview</div><div id="pvBox">${fbPreview()}</div></div></div>`}
+ <div class="grid g3 keep2">${FLD("👍 Likes",a+".reactions.like",{type:"number",t:"n",x:'min="0"'})}${FLD("❤️ Love",a+".reactions.love",{type:"number",t:"n",x:'min="0"'})}${FLD("😆 Haha",a+".reactions.haha",{type:"number",t:"n",x:'min="0"'})}${FLD("💬 Comments",a+".comments",{type:"number",t:"n",x:'min="0"'})}${FLD("↗ Shares",a+".shares",{type:"number",t:"n",x:'min="0"'})}</div></div>`}
+function st3(){return`<div class="split">${adFieldsHTML("W.camp.ads.0")}<div><div class="small muted" style="font-weight:700;margin-bottom:8px">Live preview</div><div id="pvBox">${fbPreview(W.camp.ads[0])}</div></div></div>`}
 function st4(){const g=W.gen,modes=[...(W.mode==="edit"?[["keep","Keep existing numbers","Daily numbers stay exactly as they are"]]:[]),["gen","Generate history","Fill a date range with natural-looking daily numbers"],...(W.mode==="new"?[["zero","Start from zero","Add numbers day by day later"]]:[])];
  return`<div class="grid"><div class="grid g3">${modes.map(m=>`<div class="opt ${g.mode===m[0]?"on":""}" data-act="genMode" data-v="${m[0]}"><b>${m[1]}</b><div class="muted small">${m[2]}</div></div>`).join("")}</div>
  ${g.mode==="gen"?`<div class="grid g4 keep2">${FLD("From","W.gen.start",{type:"date"})}${FLD("To","W.gen.end",{type:"date",x:'max="'+todayIST()+'"'})}${FLD("Total spent ("+cs()+")","W.gen.spend",{type:"number",t:"n"})}${FLD("Total reach","W.gen.reach",{type:"number",t:"n"})}${FLD("Impressions","W.gen.impressions",{type:"number",t:"n"})}${FLD("Link clicks","W.gen.clicks",{type:"number",t:"n"})}${FLD("Unique clicks","W.gen.unique_clicks",{type:"number",t:"n"})}${FLD("Results","W.gen.results",{type:"number",t:"n"})}</div><p class="muted small">The totals are split across the dates and always add up exactly. You can fine-tune every day later in Daily numbers.</p>`:""}</div>`}
@@ -570,24 +604,48 @@ const ACT={
   genDaily:el=>guard(el,async()=>{const r=await api("/admin/api/demo-generate","POST",{...S.gen});const c=S.acct.doc.campaigns[S.day.ci];Object.assign(c.daily,r.daily);loadDay();markDirty();subDaily();toast("Generated "+Object.keys(r.daily).length+" days")}),
   clearAllDays:()=>{if(confirm("Remove every daily number of this campaign?")){S.acct.doc.campaigns[S.day.ci].daily={};loadDay();markDirty();subDaily()}},
   /* wizard */
-  wizClose:()=>{if(confirm("Close without saving this campaign?")){closeModal();W=null}},
+  wizClose:()=>{if(confirm("Close without saving this campaign?")){closeModal();W=null;REFRESH=()=>{}}},
   wizBack:()=>{if(W.step>0){W.step--;wizRender()}},
   wizNext:()=>{const e=wizCheck();if(e)return toast(e,"bad");W.step++;wizRender()},
   wizFinish:el=>guard(el,async()=>{
     const c=W.camp,a=c.adsets[0],ad=c.ads[0];a.name=(a.name||"").trim()||c.name;ad.name=(ad.name||"").trim()||c.name+" ad";c.name=c.name.trim();if(W.mode==="new"){delete ad.adset_id;c.created=todayIST()}
     if(W.gen.mode==="gen"){const r=await api("/admin/api/demo-generate","POST",{...W.gen});c.daily=W.mode==="new"?r.daily:Object.assign({},c.daily,r.daily)}
     const mode=W.mode;if(mode==="new")S.acct.doc.campaigns.push(c);else S.acct.doc.campaigns[W.idx]=c;
-    await saveDoc();closeModal();W=null;S.sub="campaigns";viewEditor();confetti();toast(mode==="new"?"Campaign created 🎉":"Campaign saved ✓")}),
+    await saveDoc();closeModal();W=null;REFRESH=()=>{};S.sub="campaigns";viewEditor();confetti();toast(mode==="new"?"Campaign created 🎉":"Campaign saved ✓")}),
   obj:el=>{W.camp.objective=el.dataset.v;W.camp.result_action=RESULT_BY_OBJ[el.dataset.v];wizRender()},
-  wstatus:el=>{W.camp.status=el.dataset.v;wizRender()},
-  wastatus:el=>{W.camp.adsets[0].status=el.dataset.v;wizRender()},
-  wgender:el=>{W.camp.adsets[0].genders=+el.dataset.v;wizRender()},
-  tog:el=>{const arr=getp(el.dataset.p),v=el.dataset.v,i=arr.indexOf(v);i<0?arr.push(v):arr.splice(i,1);wizRender()},
-  tagDel:el=>{getp(el.dataset.p).splice(+el.dataset.i,1);wizRender()},
-  addInterest:el=>{const a=W.camp.adsets[0].interests;if(!a.includes(el.dataset.v))a.push(el.dataset.v);wizRender()},
-  autoPl:el=>{W.camp.adsets[0].placements.auto=el.checked;wizRender()},
-  sampleVideo:()=>{W.camp.ads[0].video_url=S.sample;wizRender()},
+  setv:el=>{const v=el.dataset.v;setp(el.dataset.p,/^\d+$/.test(v)?+v:v);REFRESH()},
+  closeEdit:()=>closeEditor(),
+  toggleDetail:el=>{const i=+el.dataset.i;S.open[i]=!S.open[i];subCampaigns()},
+  tog:el=>{const arr=getp(el.dataset.p),v=el.dataset.v,i=arr.indexOf(v);i<0?arr.push(v):arr.splice(i,1);REFRESH()},
+  tagDel:el=>{getp(el.dataset.p).splice(+el.dataset.i,1);REFRESH()},
+  addInterest:el=>{const a=getp(el.dataset.p);if(!a.includes(el.dataset.v))a.push(el.dataset.v);REFRESH()},
+  autoPl:el=>{setp(el.dataset.p,el.checked);REFRESH()},
+  sampleVideo:el=>{setp(el.dataset.p,S.sample);REFRESH()},
   genMode:el=>{W.gen.mode=el.dataset.v;wizRender()},
+  /* ad sets and ads */
+  asStatus:el=>{S.acct.doc.campaigns[+el.dataset.i].adsets[+el.dataset.k].status=el.checked?"ACTIVE":"PAUSED";markDirty();subCampaigns()},
+  adStatus:el=>{S.acct.doc.campaigns[+el.dataset.i].ads[+el.dataset.k].status=el.checked?"ACTIVE":"PAUSED";markDirty();subCampaigns()},
+  editAdset:el=>openEditor("adset",+el.dataset.i,+el.dataset.k),
+  newAdset:el=>openEditor("adset",+el.dataset.i,-1),
+  editAd:el=>openEditor("ad",+el.dataset.i,+el.dataset.k),
+  newAd:el=>openEditor("ad",+el.dataset.i,-1),
+  delAdset:el=>{const c=S.acct.doc.campaigns[+el.dataset.i];if(c.adsets.length<2)return toast("A campaign needs at least one ad set","bad");if(confirm("Delete this ad set? Its ads move to the first ad set.")){c.adsets.splice(+el.dataset.k,1);markDirty();subCampaigns()}},
+  delAd:el=>{const c=S.acct.doc.campaigns[+el.dataset.i];if(confirm("Delete this ad?")){c.ads.splice(+el.dataset.k,1);markDirty();subCampaigns()}},
+  saveEdit:el=>guard(el,async()=>{
+    const e=S.edit,c=S.acct.doc.campaigns[S.editCi],neu=S.editIdx<0;
+    if(S.editKind==="adset"){
+      if(!(e.name||"").trim())e.name=c.name;
+      if(!(e.daily_budget>0))throw new Error("Enter a daily budget");
+      if(e.end_time&&e.end_time<e.start_time)throw new Error("End date must be after the start date");
+      if(!e.countries.length)throw new Error("Add at least one country, for example IN");
+      if(e.age_min>e.age_max)throw new Error("Minimum age cannot be above maximum age");
+      if(neu)c.adsets.push(e);else c.adsets[S.editIdx]=e;
+    }else{
+      if(!(e.name||"").trim())e.name=c.name+" ad";
+      if(e.video_url&&!/^https?:\/\//.test(e.video_url))throw new Error("The video link must start with https://");
+      if(neu)c.ads.push(e);else c.ads[S.editIdx]=e;
+    }
+    await saveDoc();closeEditor();subCampaigns();toast(neu?"Added ✓":"Saved ✓")}),
   /* app control */
   saveMaint:el=>guard(el,async()=>{await api("/admin/api/maintenance","POST",{enabled:$("#m_on").checked,message:$("#m_msg").value});toast($("#m_on").checked?"Maintenance is ON":"Maintenance is OFF");await loadOverview()}),
   unblockAll:el=>guard(el,async()=>{const r=await api("/admin/api/unblock-all","POST",{});toast(r.unblocked+" device(s) unblocked")}),
@@ -600,7 +658,7 @@ document.addEventListener("click",e=>{const el=e.target.closest("[data-act]");if
 document.addEventListener("change",e=>{const el=e.target.closest("[data-chg]");if(el&&CHG[el.dataset.chg])CHG[el.dataset.chg](el)});
 document.addEventListener("keydown",e=>{
   const t=e.target.closest&&e.target.closest("[data-tagin]");if(!t)return;const path=t.dataset.tagin;
-  const refocus=()=>{wizRender();const n=$(`[data-tagin="${path}"]`);n&&n.focus()};
+  const refocus=()=>{REFRESH();const n=$(`[data-tagin="${path}"]`);n&&n.focus()};
   if(e.key==="Enter"||e.key===","){e.preventDefault();let v=t.value.trim().replace(/,$/,"");if(!v)return;if(t.dataset.up){v=v.toUpperCase();if(v.length!==2)return toast("Use a 2-letter country code like IN","bad")}const arr=getp(path);if(!arr.includes(v))arr.push(v);refocus()}
   else if(e.key==="Backspace"&&!t.value){const arr=getp(path);if(arr.length){arr.pop();refocus()}}
 });
